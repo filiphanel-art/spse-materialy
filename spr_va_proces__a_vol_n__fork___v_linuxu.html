@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <title>Správa procesů a Volání fork() v Linuxu - SPŠE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>.reveal { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }</style>
+</head>
+<body>
+    <div class="reveal"><div class="slides">
+      <section><h1 style="color:#38bdf8;">Správa procesů a Volání fork() v Linuxu</h1><h3>Operacni Systemy</h3></section>
+      <section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Úvod do konceptu procesů</h2><ul style="text-align:left;font-size:0.8em;"><li>Proces je běžící instance programu v operačním systému.</li><li>Každému procesu OS přiděluje unikátní identifikátor <code>PID</code> (Process ID).</li><li>Procesy se organizují do stromové struktury podle vztahu Rodič (PPID) -> Potomek (PID).</li></ul></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">System Call fork() v C/C++</h2><ul style="text-align:left;font-size:0.8em;"><li>Volání <code>fork()</code> vnoří kompletní kopii adresního prostoru rodiče.</li><li>V rodiči vrací PID potomka, v potomkovi vrací 0, při chybě -1.</li></ul><pre><code class="language-cpp">#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/types.h&gt;
+
+int main() {
+    printf(&quot;Zahájení hlavního procesu PID: %d\n&quot;, getpid());
+    pid_t pid = fork();
+    
+    if (pid == 0) {
+        printf(&quot;[POTOMEK] Já jsem nová větev! PID: %d, PPID: %d\n&quot;, getpid(), getppid());
+    } else if (pid &gt; 0) {
+        printf(&quot;[RODIČ] Vytvořil jsem potomka s PID: %d\n&quot;, pid);
+    }
+    return 0;
+}</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Verifikace rodokmenu v CLI</h2><ul style="text-align:left;font-size:0.8em;"><li>Pomocí příkazů <code>ps -ef --forest</code> nebo <code>pstree</code> vizualizujeme hierarchii.</li></ul><div style="background:#020617;border:1px solid #1e293b;border-radius:8px;padding:15px;text-align:left;font-family:monospace;font-size:0.7em;"><div style="color:#4ade80;font-weight:bold;">spse@lab:~$ pstree -p -s 1234</div><pre style="color:#e2e8f0;margin-top:5px;white-space:pre-wrap;">systemd(1)───sshd(890)───sshd(1120)───bash(1200)───my_process(1234)─┬─my_process(1235)
+                                                                     └─my_process(1236)</pre></div></section>
+    </div></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        Reveal.initialize({controls: true, progress: true, center: true, hash: true, plugins: [ RevealHighlight ]})
+        .then(() => { mermaid.run({ querySelector: '.mermaid' }); });
+    </script>
+</body>
+</html>
