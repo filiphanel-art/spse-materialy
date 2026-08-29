@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <title>Souborové systémy a adresářová struktura v OS Windows a Linux - SPŠE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>.reveal { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }</style>
+</head>
+<body>
+    <div class="reveal"><div class="slides">
+      <section><h1 style="color:#38bdf8;">Souborové systémy a adresářová struktura v OS Windows a Linux</h1><h3>Operacni Systemy</h3></section>
+      <section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Základní rozdíly v organizaci souborů</h2><ul style="text-align:left;font-size:0.8em;"><li>Windows ukládá soubory na logické disky jako C: nebo D:.</li><li>Linux organizuje soubory do jednoho adresářového stromu s kořenem /.</li><li>V Linuxu mohou existovat dva soubory se stejným názvem díky case-sensitivity.</li><li>Windows nepovoluje dva stejně pojmenované soubory ve stejné složce.</li></ul><div class="mermaid">graph TD
+  subgraph Linux
+    Root["/ (Kořen)"] --> bin["/bin"]
+    Root --> home["/home"]
+  end
+  subgraph Windows
+    C["Disk C:"] --> Users["Users"]
+    D["Disk D:"] --> Data["Data"]
+  end</div></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Filesystem Hierarchy Standard (FHS) v Linuxu</h2><ul style="text-align:left;font-size:0.8em;"><li>FHS standardizuje adresářovou strukturu a zajišťuje kompatibilitu linuxových distribucí.</li><li>Kořenový adresář / má být co nejmenší pro nouzový start.</li><li>/etc obsahuje globální systémové konfigurační soubory pro všechny uživatele.</li><li>/bin a /sbin obsahují základní spustitelné programy a administrátorské nástroje.</li></ul><pre><code class="language-bash"># Zobrazení základní struktury kořenového adresáře v Linuxu
+ls -F /</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Reprezentace periferních zařízení v Linuxu</h2><ul style="text-align:left;font-size:0.8em;"><li>V UNIXu a Linuxu platí zásada, že všechno je soubor.</li><li>Pevné disky, tiskárny a CD-ROM jsou reprezentovány soubory v /dev.</li><li>Oddíly prvního SATA disku se označují jako /dev/sda1, /dev/sda2.</li><li>Windows naopak přistupuje k zařízením jako k hardwarovým objektům s písmeny.</li></ul><pre><code class="language-bash"># Výpis souborů zařízení pro pevné disky a jejich oddíly
+ls -l /dev/sd*</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Uživatelská data a konfigurace: AppData vs /home</h2><ul style="text-align:left;font-size:0.8em;"><li>Složka AppData ve Windows obsahuje specifická uživatelská nastavení aplikací.</li><li>Obsahuje tři podsložky: Local, LocalLow a Roaming.</li><li>V Linuxu odpovídá uživatelskému zázemí domovský adresář v /home/username.</li><li>Do složky Roaming lze ve Windows přistoupit přes systémovou proměnnou %AppData%.</li></ul><pre><code class="language-config"># Rychlé otevření složky AppData\Roaming ve Windows
+%AppData%</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Porovnání souborových systémů: NTFS vs. EXT4</h2><ul style="text-align:left;font-size:0.8em;"><li>NTFS je proprietární souborový systém vyvinutý společností Microsoft.</li><li>Podporuje žurnálování, vestavěnou kompresi za běhu a diskové kvóty.</li><li>EXT4 minimalizuje fragmentaci pomocí mechanismu extentů a je open-source.</li><li>EXT4 podporuje svazky do 1 EiB a velikost souborů do 16 TiB.</li></ul><pre><code class="language-bash"># Kontrola typu připojených souborových systémů v Linuxu
+df -T</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Správa přístupových práv k souborům</h2><ul style="text-align:left;font-size:0.8em;"><li>Všechny soubory a složky v Linuxu mají přesně definovaná přístupová práva.</li><li>Oprávnění rozlišují vlastníka (owner), skupinu (group) a ostatní uživatele (others).</li><li>NTFS nabízí detailní ACL oprávnění pro uživatele a skupiny ve Windows.</li><li>Standardní UNIX oprávnění nejsou plně kompatibilní se systémem práv NTFS.</li></ul><pre><code class="language-bash"># Nastavení práv: vlastník vše, skupina a ostatní pouze čtení a spuštění
+chmod 755 muj_skript.sh</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Odkazy v souborových systémech: Symlinky a Zástupci</h2><ul style="text-align:left;font-size:0.8em;"><li>Symbolický odkaz (symlink) je speciální soubor obsahující cestu k cíli.</li><li>Interpretaci symlinků provádí přímo jádro operačního systému.</li><li>Ve Windows 95+ existují zástupci (.lnk) interpretovaní pouze rozhraním Windows Exploreru.</li><li>Od Windows Vista podporuje NTFS plnohodnotné symbolické odkazy na úrovni jádra.</li></ul><pre><code class="language-bash"># Vytvoření symbolického odkazu na adresář nebo soubor v Linuxu
+ln -s /cesta/k/cili odkaz_symlink</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Shrnutí a doporučení pro administraci</h2><ul style="text-align:left;font-size:0.8em;"><li>Windows a Linux přistupují k organizaci dat odlišnými architektonickými principy.</li><li>Zatímco Windows staví na logických jednotkách, Linux sjednocuje vše pod /.</li><li>Znalost FHS a typů oddílů je klíčová pro datovou kompatibilitu.</li><li>Moderní verze obou OS již na úrovni jádra plně podporují symbolické odkazy.</li></ul></section>
+    </div></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        Reveal.initialize({controls: true, progress: true, center: true, hash: true, plugins: [ RevealHighlight ]})
+        .then(() => { mermaid.run({ querySelector: '.mermaid' }); });
+    </script>
+</body>
+</html>
