@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <title>Historie a vývoj OS, distribuce a edice - SPŠE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>.reveal { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }</style>
+</head>
+<body>
+    <div class="reveal"><div class="slides">
+      <section><h1 style="color:#38bdf8;">Historie a vývoj OS, distribuce a edice</h1><h3>Operacni Systemy</h3></section>
+      <section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Úvod a evoluční milníky OS</h2><ul style="text-align:left;font-size:0.8em;"><li>OS se vyvinuly z dispečerů úloh na komplexní autonomní ekosystémy.</li><li>Evoluce byla hnána posunem základních abstrakcí mezi člověkem a hardwarem.</li><li>Rané systémy optimalizovaly drahý procesorový čas na sálových počítačích.</li><li>Moderní systémy integrují agentní AI architektury a izolované subsystémy.</li></ul><div class="mermaid">graph TD
+  S[Sálové počítače] --> D[Grafická rozhraní / Desktop]
+  D --> M[Mobilní a Smart OS]
+  M --> A[Agentní AI a Virtualizace]</div></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Zrod a filozofie systému UNIX</h2><ul style="text-align:left;font-size:0.8em;"><li>Vznikl v Bell Labs roku 1969 jako jednodušší reakce na Multics.</li><li>Ken Thompson a Dennis Ritchie přepsali jádro do jazyka C.</li><li>Zavedl modulární filozofii: dělej jednu věc a dělej ji dobře.</li><li>Klíčovým přínosem bylo propojení programů pomocí textových rour.</li></ul></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Architektura jádra: Monolit vs. Mikrokernel</h2><ul style="text-align:left;font-size:0.8em;"><li>Monolitické jádro integruje všechny klíčové systémové služby v kernel space.</li><li>Mikrokernel deleguje ovladače a souborové systémy do uživatelského prostoru.</li><li>Monolit exceluje ve výkonu; mikrokernel poskytuje vysokou izolaci chyb.</li><li>Hybridní jádra (Windows NT, XNU) kombinují výkon monolitů s modularitou.</li></ul><div class="mermaid">graph LR
+  subgraph Monolit
+    KM[Ovladače + VFS + Plánovač] --> HW1[Hardware]
+  end
+  subgraph Mikrokernel
+    UM[Ovladače + VFS] <-->|IPC| MK[Mikrokernel]
+    MK --> HW2[Hardware]
+  end</div></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Evoluce Microsoft Windows a jádro NT</h2><ul style="text-align:left;font-size:0.8em;"><li>První Windows (1.0-3.x) byly pouze grafické nadstavby nad MS-DOS.</li><li>Přechod na plně 32-bitový preemptivní multitasking přineslo jádro NT.</li><li>NT zavádí Hardware Abstraction Layer pro nezávislost na hardwaru.</li><li>V NT se prostředky spravují unifikovaně jako objekty s popisovači.</li></ul><pre><code class="language-c">// Ukázka vytvoření pojmenovaného objektu Event ve Windows NT API
+HANDLE hEvent = CreateEventW(NULL, TRUE, FALSE, L&quot;SPSE_Event&quot;);
+if (hEvent == NULL) {
+    ExitProcess(1);
+}</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Apple macOS: Od klasiky k Darwinu</h2><ul style="text-align:left;font-size:0.8em;"><li>Původní Mac OS (1984) postrádal ochranu paměti a preemptivní multitasking.</li><li>Akvizice NeXTSTEP v roce 1997 přinesla moderní Unixový základ.</li><li>Mac OS X (2001) staví na otevřeném jádru Darwin.</li><li>Jádro XNU kombinuje mikrokernel Mach a robustní BSD vrstvu.</li></ul></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Ekosystém Linuxu a rodiny distribucí</h2><ul style="text-align:left;font-size:0.8em;"><li>Linux je otevřené monolitické jádro vytvořené Linusem Torvaldsem roku 1991.</li><li>Debian rodina (včetně Ubuntu) se zaměřuje na stabilitu a širokou podporu.</li><li>Red Hat rodina (RHEL, Rocky, Fedora) dominuje v podnikovém segmentu.</li><li>Arch Linux nabízí rolling release model s absolutní uživatelskou kontrolou.</li></ul><pre><code class="language-bash"># Zjištění informací o distribuci a verzi jádra v Linuxu
+uname -a
+cat /etc/os-release</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Smart OS: Konvergence a Tizen OS</h2><ul style="text-align:left;font-size:0.8em;"><li>Chytrá zařízení procházejí konvergencí sjednocující televize, mobily a IoT.</li><li>Tizen OS je open-source systém vyvíjený Samsungem a Linux Foundation.</li><li>Tizen využívá Linux kernel s dedikovanou vrstvou SmartThings.</li><li>Podporuje HTML5 webové aplikace i nativní C/C++ runtime.</li></ul><div class="mermaid">graph TD
+  subgraph Tizen_Architektura
+    A[Aplikace: Web / Native / .NET] --> API[Tizen API Layer]
+    API --> MW[Middleware & Security / SMACK]
+    MW --> K[Linux Kernel]
+    K --> HW[Fyzický Hardware]
+  end</div></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">Shrnutí a trendy (CorePC, VBS, AI)</h2><ul style="text-align:left;font-size:0.8em;"><li>Zabezpečení moderních OS staví na virtualizaci a čipu TPM 2.0.</li><li>Architektura Windows se mění na bezstavový CorePC model pouze pro čtení.</li><li>Operační systémy integrují lokální AI inference prováděné na NPU.</li><li>Evoluce směřuje k sémantickým AIOS modelům řízeným přirozeným jazykem.</li></ul></section>
+    </div></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        Reveal.initialize({controls: true, progress: true, center: true, hash: true, plugins: [ RevealHighlight ]})
+        .then(() => { mermaid.run({ querySelector: '.mermaid' }); });
+    </script>
+</body>
+</html>
