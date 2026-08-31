@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <title>GPT a BR - SPŠE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>.reveal { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }</style>
+</head>
+<body>
+    <div class="reveal"><div class="slides">
+      <section><h1 style="color:#38bdf8;">GPT a BR</h1><h3>Operacni Systemy</h3></section>
+      <section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">1. Úvod: GPT a BR</h2><ul style="text-align:left;font-size:0.8em;"><li>Základní stavební kámen probíraný v předmětu Operacni Systemy.</li><li>Přesné rozdělení rolí a rozhraní v rámci systémové architektury.</li><li>Klíčové bezpečnostní a výkonnostní požadavky.</li></ul></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">2. Implementace v C a POSIX API</h2><ul style="text-align:left;font-size:0.8em;"><li>Ukázka systémových volání s kontrolou chybových návratových stavů.</li></ul><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+
+int main(void) {
+    printf(&quot;Inicializace systémové komponenty...\n&quot;);
+    // Provádění klíčové operace
+    return EXIT_SUCCESS;
+}</code></pre></section>
+<section><h2 style="color:#38bdf8;border-bottom:2px solid #2563eb;padding-bottom:10px;">3. Diagnostika v Linux CLI</h2><ul style="text-align:left;font-size:0.8em;"><li>Ověření stavu přes systémový terminál.</li></ul><div style="background:#020617;border:1px solid #1e293b;border-radius:8px;padding:15px;text-align:left;font-family:monospace;font-size:0.7em;"><div style="color:#4ade80;font-weight:bold;">spse@lab:~$ free -h &amp;&amp; vmstat 1 2</div><pre style="color:#e2e8f0;margin-top:5px;white-space:pre-wrap;">              total        used        free      shared  buff/cache   available
+Mem:           15Gi       3.2Gi       8.1Gi       210Mi       4.1Gi        11Gi</pre></div></section>
+    </div></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        Reveal.initialize({controls: true, progress: true, center: true, hash: true, plugins: [ RevealHighlight ]})
+        .then(() => { mermaid.run({ querySelector: '.mermaid' }); });
+    </script>
+</body>
+</html>
