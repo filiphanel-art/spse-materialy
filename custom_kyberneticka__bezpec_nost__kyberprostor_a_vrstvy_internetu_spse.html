@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="cs" data-subject-theme="cyber" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kybernetická bezpečnost, kyberprostor a vrstvy internetu - SPŠE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      .reveal {
+        width: 100vw;
+        height: 100vh;
+        background-color: #0b0f19;
+        color: #f1f5f9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      .reveal .slides {
+        text-align: left;
+      }
+      .reveal h1, .reveal h2, .reveal h3 {
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        text-transform: none;
+      }
+      .reveal pre {
+        box-shadow: none;
+        width: 100%;
+        margin: 10px 0;
+      }
+    </style>
+</head>
+<body>
+    <div class="reveal"><div class="slides">
+      <section>
+        <div style="position:relative;overflow:hidden;box-sizing:border-box;padding:30px;text-align:center;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <svg width="260" height="260" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:-20px;bottom:-20px;opacity:0.08;pointer-events:none;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3" stroke-width="2"/></svg>
+          <h1 style="color:#a78bfa;font-size:1.7em;line-height:1.2;margin-bottom:0.3em;max-width:900px;position:relative;z-index:1;">Kybernetická bezpečnost, kyberprostor a vrstvy internetu</h1>
+          <h3 style="color:#94a3b8;font-size:0.95em;font-weight:500;margin-bottom:1.5em;position:relative;z-index:1;">Počítačové sítě a kybernetická bezpečnost</h3>
+          <p style="color:#64748b;font-size:0.7em;letter-spacing:0.05em;text-transform:uppercase;position:relative;z-index:1;">Mgr. Filip Hanel</p>
+        </div>
+      </section>
+      <section><div style="position:relative;overflow:hidden;box-sizing:border-box;padding:30px 40px;text-align:left;width:100%;height:100%;display:flex;flex-direction:column;"><svg width="260" height="260" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:-20px;bottom:-20px;opacity:0.08;pointer-events:none;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3" stroke-width="2"/></svg><h2 style="color:#a78bfa;border-bottom:2px solid #7c3aed;padding-bottom:12px;margin-bottom:24px;position:relative;z-index:1;font-size:1.4em;line-height:1.2;text-align:left;flex-shrink:0;">Úvod do kybernetické bezpečnosti</h2><div style="position:relative;z-index:1;overflow:auto;"><ul style="text-align:left;font-size:0.65em;line-height:1.6;margin:0;padding-left:1.5em;display:flex;flex-direction:column;gap:10px;"><li style="margin-bottom:4px;">Kybernetická bezpečnost se stala jednou z hlavních priorit národních politik kvůli závislosti moderní společnosti na ICT.</li><li style="margin-bottom:4px;">Definuje se jako souhrn právních, organizačních, technických a vzdělávacích prostředků k ochraně počítačových systémů, dat a uživatelů.</li><li style="margin-bottom:4px;">Zahrnuje schopnost systémů odolávat a reagovat na hrozby, stejně jako plánování obnovy funkčnosti služeb.</li></ul></div></div></section>
+<section><div style="position:relative;overflow:hidden;box-sizing:border-box;padding:30px 40px;text-align:left;width:100%;height:100%;display:flex;flex-direction:column;"><svg width="260" height="260" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:-20px;bottom:-20px;opacity:0.08;pointer-events:none;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3" stroke-width="2"/></svg><h2 style="color:#a78bfa;border-bottom:2px solid #7c3aed;padding-bottom:12px;margin-bottom:24px;position:relative;z-index:1;font-size:1.4em;line-height:1.2;text-align:left;flex-shrink:0;">Co je kyberprostor?</h2><div style="position:relative;z-index:1;overflow:auto;"><ul style="text-align:left;font-size:0.65em;line-height:1.6;margin:0;padding-left:1.5em;display:flex;flex-direction:column;gap:10px;"><li style="margin-bottom:4px;">Pojem poprvé použil v roce 1982 William Gibson v povídce 'Jak vypálit Chrom'.</li><li style="margin-bottom:4px;">Dle české legislativy (ZoKB § 2) je kyberprostor digitální prostředí umožňující vznik, zpracování a výměnu informací.</li><li style="margin-bottom:4px;">Je tvořen informačními systémy, službami a sítěmi elektronických komunikací, které spolu interagují.</li></ul></div></div></section>
+<section><div style="position:relative;overflow:hidden;box-sizing:border-box;padding:30px 40px;text-align:left;width:100%;height:100%;display:flex;flex-direction:column;"><svg width="260" height="260" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:-20px;bottom:-20px;opacity:0.08;pointer-events:none;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3" stroke-width="2"/></svg><h2 style="color:#a78bfa;border-bottom:2px solid #7c3aed;padding-bottom:12px;margin-bottom:24px;position:relative;z-index:1;font-size:1.4em;line-height:1.2;text-align:left;flex-shrink:0;">Tři vrstvy kyberprostoru</h2><div style="position:relative;z-index:1;overflow:auto;"><ul style="text-align:left;font-size:0.65em;line-height:1.6;margin:0;padding-left:1.5em;display:flex;flex-direction:column;gap:10px;"><li style="margin-bottom:4px;">Fyzická vrstva: zahrnuje geografické umístění prvků a fyzickou síťovou infrastrukturu (kabely, routery, switche).</li><li style="margin-bottom:4px;">Logická vrstva: reprezentuje logická propojení mezi uzly realizovaná prostřednictv sítě a komunikačních protokolů.</li><li style="margin-bottom:4px;">Sociální vrstva: skládá se z reálných osob (osobnost) a jejich digitální identity na síti (kyberosobnost).</li></ul></div></div></section>
+<section><div style="position:relative;overflow:hidden;box-sizing:border-box;padding:30px 40px;text-align:left;width:100%;height:100%;display:flex;flex-direction:column;"><svg width="260" height="260" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:-20px;bottom:-20px;opacity:0.08;pointer-events:none;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3" stroke-width="2"/></svg><h2 style="color:#a78bfa;border-bottom:2px solid #7c3aed;padding-bottom:12px;margin-bottom:24px;position:relative;z-index:1;font-size:1.4em;line-height:1.2;text-align:left;flex-shrink:0;">Vrstvy webu: Surface Web</h2><div style="position:relative;z-index:1;overflow:auto;"><ul style="text-align:left;font-size:0.65em;line-height:1.6;margin:0;padding-left:1.5em;display:flex;flex-direction:column;gap:10px;"><li style="margin-bottom:4px;">Představuje veřejně dostupnou část internetu, kterou běžné vyhledávače dokážou indexovat.</li><li style="margin-bottom:4px;">Obsahuje weby dostupné bez speciálních nástrojů či přihlašovacích údajů.</li><li style="margin-bottom:4px;">Laická veřejnost často chybně ztotožňuje Surface Web s celým kyberprostorem.</li></ul></div></div></section>
+<section><div style="position:relative;overflow:hidden;box-sizing:border-box;padding:30px 40px;text-align:left;width:100%;height:100%;display:flex;flex-direction:column;"><svg width="260" height="260" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:-20px;bottom:-20px;opacity:0.08;pointer-events:none;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3" stroke-width="2"/></svg><h2 style="color:#a78bfa;border-bottom:2px solid #7c3aed;padding-bottom:12px;margin-bottom:24px;position:relative;z-index:1;font-size:1.4em;line-height:1.2;text-align:left;flex-shrink:0;">Vrstvy webu: Deep Web</h2><div style="position:relative;z-index:1;overflow:auto;"><ul style="text-align:left;font-size:0.65em;line-height:1.6;margin:0;padding-left:1.5em;display:flex;flex-direction:column;gap:10px;"><li style="margin-bottom:4px;">Služby a data dostupná pouze v rámci konkrétních sítí a zařízení.</li><li style="margin-bottom:4px;">Obsahuje neindexované stránky, firemní databáze, akademické sítě či obsah chráněný heslem a paywallem.</li><li style="margin-bottom:4px;">Zahrnuje data, která nejsou záměrně skrytá, ale běžný vyhledávač k nim nemá přístup.</li></ul></div></div></section>
+<section><div style="position:relative;overflow:hidden;box-sizing:border-box;padding:30px 40px;text-align:left;width:100%;height:100%;display:flex;flex-direction:column;"><svg width="260" height="260" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:-20px;bottom:-20px;opacity:0.08;pointer-events:none;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3" stroke-width="2"/></svg><h2 style="color:#a78bfa;border-bottom:2px solid #7c3aed;padding-bottom:12px;margin-bottom:24px;position:relative;z-index:1;font-size:1.4em;line-height:1.2;text-align:left;flex-shrink:0;">Vrstvy webu: Dark Web</h2><div style="position:relative;z-index:1;overflow:auto;"><ul style="text-align:left;font-size:0.65em;line-height:1.6;margin:0;padding-left:1.5em;display:flex;flex-direction:column;gap:10px;"><li style="margin-bottom:4px;">Zahrnuje služby a data, která jsou záměrně skrytá a nedostupná běžnými metodami.</li><li style="margin-bottom:4px;">Přístup je možný výhradně s využitím specifických protokolů a speciálních šifrovacích nástrojů.</li><li style="margin-bottom:4px;">Společně s Deep Webem bývají tyto sítě označovány jako Darknets (D4rkN3ts).</li></ul></div></div></section>
+<section><div style="position:relative;overflow:hidden;box-sizing:border-box;padding:30px 40px;text-align:left;width:100%;height:100%;display:flex;flex-direction:column;"><svg width="260" height="260" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:-20px;bottom:-20px;opacity:0.08;pointer-events:none;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3" stroke-width="2"/></svg><h2 style="color:#a78bfa;border-bottom:2px solid #7c3aed;padding-bottom:12px;margin-bottom:24px;position:relative;z-index:1;font-size:1.4em;line-height:1.2;text-align:left;flex-shrink:0;">Ověření zabezpečení HTTPS</h2><div style="position:relative;z-index:1;overflow:auto;"><div style="background:#020617;border:1px solid #1e293b;border-radius:12px;padding:16px;text-align:left;font-family:monospace;font-size:0.55em;margin-top:15px;box-shadow:0 10px 25px rgba(0,0,0,0.5);"><div style="color:#4ade80;font-weight:bold;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;"></span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#eab308;"></span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;"></span><span style="margin-left:8px;">spse@lab:~$ curl -I https://www.nic.cz</span></div><pre style="color:#e2e8f0;margin:0;white-space:pre-wrap;line-height:1.4;">HTTP/2 200
+server: Apache
+content-type: text/html; charset=UTF-8
+strict-transport-security: max-age=15768000
+x-frame-options: DENY</pre></div></div></div></section>
+    </div></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        Reveal.initialize({
+          width: 1200,
+          height: 675,
+          margin: 0.04,
+          minScale: 0.2,
+          maxScale: 2.0,
+          controls: true,
+          progress: true,
+          center: true,
+          hash: true,
+          slideNumber: 'c/t',
+          plugins: [ RevealHighlight ]
+        }).then(function() {
+          mermaid.run({ querySelector: '.mermaid' });
+        });
+    </script>
+</body>
+</html>
