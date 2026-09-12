@@ -333,10 +333,22 @@ ul[data-bullet-markers="hidden"] > li::marker {
   align-items: center;
   justify-content: space-between;
   gap: 4%;
-  background: var(--op2-blue);
   color: #fff;
   z-index: 2;
   font-size: clamp(10px, 1.65cqw, 18px);
+}
+
+/* Rozšíření patičky přes celý přesah obrazovky v Reveal.js (letterboxing) */
+.op2-slide .op2-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: -100vh;
+  left: -100vw;
+  right: -100vw;
+  background: var(--op2-blue);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .op2-slide .op2-logo {
@@ -451,9 +463,12 @@ ul[data-bullet-markers="hidden"] > li::marker {
 }
 
 .op2-slide[data-op2-scheme="blue"] .op2-footer {
+  color: #ffffff !important;
+}
+
+.op2-slide[data-op2-scheme="blue"] .op2-footer::before {
   background: #0d4e80 !important;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff !important;
 }
 
 .op2-slide[data-op2-scheme="blue"] .panel {
@@ -542,6 +557,7 @@ ul[data-bullet-markers="hidden"] > li::marker {
   color: #d0e6f7 !important;
   fill: #d0e6f7 !important;
 }
+
 
 
     
