@@ -1,0 +1,216 @@
+{
+  "title": "DHCP na Windows Serveru",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Co je DHCP a jeho účel",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Dynamický protokol pro automatickou konfiguraci hostitelů",
+          "Centrální přidělování IP adres a síťových parametrů",
+          "Prevence konfliktů IP adres v síťové infrastruktuře",
+          "Komunikace probíhá na UDP portech 67 a 68"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-2",
+      "title": "Princip fungování a architektura",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Funguje na architektuře klient a server",
+          "Klient bez IP adresy vysílá všesměrový broadcast",
+          "Server odpovídá s nabídkou dostupné konfigurace sítě",
+          "Adresy se přidělují na omezenou dobu zápůjčky"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Průběh komunikace DORA",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Fáze",
+            "Zpráva",
+            "Typ přenosu",
+            "Popis"
+          ],
+          "rows": [
+            [
+              "D",
+              "DHCP Discover",
+              "Broadcast",
+              "Klient hledá dostupný DHCP server"
+            ],
+            [
+              "O",
+              "DHCP Offer",
+              "Unicast / Broadcast",
+              "Server nabízí IP adresu a parametry"
+            ],
+            [
+              "R",
+              "DHCP Request",
+              "Broadcast",
+              "Klient žádá o nabízenou IP adresu"
+            ],
+            [
+              "A",
+              "DHCP ACK",
+              "Unicast / Broadcast",
+              "Server potvrdí zápůjčku IP adresy"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-4",
+      "title": "Diagram DORA procesu",
+      "type": "network_topology",
+      "content": {
+        "bullet_points": [],
+        "mermaid_diagram": "sequenceDiagram\n    autonumber\n    participant K as Klient\n    participant S as DHCP Server\n    K->>S: DHCP Discover (Broadcast, UDP 67/68)\n    S->>K: DHCP Offer (Nabídka konfigurace)\n    K->>S: DHCP Request (Žádost o nabídku)\n    S->>K: DHCP ACK (Potvrzení zápůjčky)"
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-5",
+      "title": "DHCP Options (Volitelné parametry)",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Option",
+            "Název parametru",
+            "Funkce"
+          ],
+          "rows": [
+            [
+              "Option 1",
+              "Subnet Mask",
+              "Maska podsítě pro klienta"
+            ],
+            [
+              "Option 3",
+              "Router",
+              "IP adresa výchozí brány"
+            ],
+            [
+              "Option 6",
+              "DNS Servers",
+              "Adresy preferovaných DNS serverů"
+            ],
+            [
+              "Option 15",
+              "Domain Name",
+              "Název domény pro překlad jmen"
+            ],
+            [
+              "Option 51",
+              "Lease Time",
+              "Doba trvání zápůjčky IP adresy"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-6",
+      "title": "DHCP Pool, Zápůjčka a Rezervace",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "DHCP Pool určuje rozsah dynamicky přidělovaných adres",
+          "Lease Time stanovuje dobu platnosti přidělené adresy",
+          "Rezervace pevně sváže IP adresu s MAC adresou",
+          "APIPA adresa (169.254.x.x) signalizuje nedostupnost DHCP"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-7",
+      "title": "Instalace DHCP role na Windows Serveru",
+      "type": "terminal_output",
+      "content": {
+        "bullet_points": [],
+        "terminal": {
+          "command": "Install-WindowsFeature -Name DHCP -IncludeManagementTools",
+          "output": "Success RestartNeeded ExitCode FeatureResult\n------- ------------- -------- -------------\nTrue    No            Success  {DHCP, RSAT-DHCP-Server-Tools}"
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-8",
+      "title": "Konfigurace DHCP v PowerShellu",
+      "type": "code_walkthrough",
+      "content": {
+        "bullet_points": [],
+        "code": {
+          "language": "powershell",
+          "highlight_lines": "",
+          "snippet": "# Autorizace serveru ve službě Active Directory\nAdd-DhcpServerInDC -DnsName dhcp01.firma.cz -IPAddress 192.168.1.5\n\n# Vytvoření nového oboru (Scope)\nAdd-DhcpServerv4Scope -Name \"Skolni-Sit\" -StartRange 192.168.1.100 -EndRange 192.168.1.200 -SubnetMask 255.255.255.0\n\n# Nastavení možností oboru (Brána a DNS)\nSet-DhcpServerv4OptionValue -ScopeId 192.168.1.0 -Router 192.168.1.1 -DNSServer 192.168.1.5"
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-9",
+      "title": "Správa a Best Practices pro DHCP",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Autorizujte DHCP server ve službě Active Directory",
+          "Konfigurujte DHCP Relay při použití více VLAN sítí",
+          "Využívejte DHCP Failover pro zajištění vysoké dostupnosti",
+          "Pravidelně kontrolujte vyčerpání IP adres v poolu"
+        ]
+      },
+      "teacher_notes": ""
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "white",
+  "sources": [
+    {
+      "title": "Quickstart: Install and configure DHCP Server - Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/windows-server/networking/technologies/dhcp/quickstart-install-configure-dhcp-server",
+      "kind": "web_page"
+    },
+    {
+      "title": "DHCP (Dynamic Host Configuration Protocol) Basics - Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/windows-server/troubleshoot/dynamic-host-configuration-protocol-basics",
+      "kind": "web_page"
+    },
+    {
+      "title": "DHCP: Dynamická Konfigurace Hostitelů – Kompletní Průvodce - StudyFi",
+      "url": "https://studyfi.com/wiki/cs/dhcp-dynamicky-protokol-konfigurace-hostitelu",
+      "kind": "web_page"
+    },
+    {
+      "title": "Vysvětlete proces DHCP pomocí zkratky DORA. - Akademie EITCA",
+      "url": "https://cs.eitca.org/cybersecurity/eitc-is-wsa-windows-server-administration/configuring-dhcp-and-dns-zones-in-windows-server/how-dhcp-works-in-windows-server/examination-review-how-dhcp-works-in-windows-server/explain-the-process-of-dhcp-using-the-acronym-dora/",
+      "kind": "web_page"
+    },
+    {
+      "title": "How to Manage DHCP using PowerShell - Microsoft Community Hub",
+      "url": "https://techcommunity.microsoft.com/blog/itopstalkblog/how-to-manage-dhcp-using-powershell/744461",
+      "kind": "web_page"
+    }
+  ]
+}
