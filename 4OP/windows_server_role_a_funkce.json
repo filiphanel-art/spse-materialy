@@ -1,0 +1,161 @@
+{
+  "title": "Windows Server Role a Funkce",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Serverové role a funkce",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Serverové role poskytují klíčové síťové a aplikační služby",
+          "Funkce rozšiřují a doplňují schopnosti operačního systému",
+          "Modulární koncept instaluje pouze potřebné součásti sítě",
+          "Správa probíhá přes Správce serveru a prostředí PowerShell"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-2",
+      "title": "Adresářové a certifikační služby (AD DS a AD CS)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "AD DS zajišťuje centralizovanou správu identit v doméně",
+          "Ukládá účty a Zásady skupiny do databáze",
+          "AD CS spravuje infrastrukturu veřejného klíče a certifikáty",
+          "Certifikáty zabezpečují šifrování HTTPS, VPN a ověřování"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Služby DNS a DHCP v síti",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Služba",
+            "Hlavní role",
+            "Popis funkce"
+          ],
+          "rows": [
+            [
+              "DNS Server",
+              "Překlad jmen",
+              "Překládá doménová jména na IP adresy"
+            ],
+            [
+              "DHCP Server",
+              "Konfigurace IP",
+              "Automaticky přiděluje IP adresy klientům"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-5",
+      "title": "Souborové služby a úložiště (File & Storage)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Zajišťuje sdílení souborů přes protokol SMB 3.x",
+          "Podporuje Obory názvů a Replikaci DFS",
+          "Umožňuje deduplikaci dat a správu kvót úložiště",
+          "Poskytuje cílový server iSCSI a Pracovní složky"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-6",
+      "title": "Vzdálený přístup a směrování (RRAS a Remote)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "RRAS zajišťuje směrování provozu a VPN připojení",
+          "Podporuje protokoly SSTP, IKEv2 a BGP směrování",
+          "Remote Desktop Services (RDS) umožňuje vzdálenou plochu",
+          "Uživatelé přistupují k aplikacím přímo na serveru"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-7",
+      "title": "Webový server (IIS) a aktualizace (WSUS)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "IIS poskytuje prostředí pro webové aplikace a HTTPS",
+          "WSUS zajišťuje centrální správu aktualizací systému Windows",
+          "WSUS šetří internetové pásmo jednorázovým stažením záplat",
+          "Umožňuje testování a schvalování aktualizací před nasazením"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-8",
+      "title": "Instalace rolí v PowerShellu",
+      "type": "terminal_output",
+      "content": {
+        "bullet_points": [],
+        "terminal": {
+          "command": "Install-WindowsFeature -Name AD-Domain-Services, DNS, DHCP, Web-Server, File-Services, Routing -IncludeManagementTools",
+          "output": "Success RestartNeeded ExitCode FeatureResult\n------- ------------- -------- -------------\nTrue    No            Success  {AD-Domain-Services, DNS, DHCP, Web-Server...}"
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-9",
+      "title": "Best Practices pro správa rolí",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Instalujte pouze nezbytně nutné serverové role",
+          "Provozujte minimálně dva doménové řadiče a DNS",
+          "Autorizujte DHCP server ve službě Active Directory",
+          "Pravidelně schvalujte bezpečnostní záplaty ve WSUS"
+        ]
+      },
+      "teacher_notes": ""
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "white",
+  "sources": [
+    {
+      "title": "Porovnání edic Windows Serveru - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/editions-comparison",
+      "kind": "web_page"
+    },
+    {
+      "title": "Co je Windows Server? | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/overview",
+      "kind": "web_page"
+    },
+    {
+      "title": "Quickstart: Install and configure DNS Server on Windows Server",
+      "url": "https://learn.microsoft.com/en-us/windows-server/networking/dns/quickstart-install-configure-dns-server",
+      "kind": "web_page"
+    },
+    {
+      "title": "Quickstart: Install and configure DHCP Server - Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/windows-server/networking/technologies/dhcp/quickstart-install-configure-dhcp-server",
+      "kind": "web_page"
+    },
+    {
+      "title": "Research report: DNS Windows Server",
+      "kind": "markdown"
+    }
+  ]
+}
