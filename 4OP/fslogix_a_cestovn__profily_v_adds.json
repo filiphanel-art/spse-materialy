@@ -1,0 +1,196 @@
+{
+  "title": "FSLogix a cestovní profily v ADDS",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Problémy tradičních cestovních profilů",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Pomalé přihlašování při stahování velkých profilů",
+          "Riziko poškození profilu při nekorektním odhlášení",
+          "Komplikovaná synchronizace vyhledávání a aplikací Office",
+          "Vysoká zátěž sítě při kopírování dat"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-2",
+      "title": "Co je FSLogix a jeho architektura",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Moderní řešení virtualizace uživatelských profilů",
+          "Ukládání profilu do virtuálního disku VHD nebo VHDX",
+          "Dynamické připojování disku přes minifiltr ovladače",
+          "Eliminace potřeby stahovat profil přes síť"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Typy kontejnerů: Profile a ODFC",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Typ kontejneru",
+            "Obsah",
+            "Hlavní využití"
+          ],
+          "rows": [
+            [
+              "Profile Container",
+              "Kompletní profil uživatele (AppData, plocha)",
+              "Jednotné řešení pro VDI a RDS"
+            ],
+            [
+              "ODFC Container",
+              "Data Microsoft 365 (Outlook OST, OneDrive)",
+              "Doplňkový kontejner k jiným profilům"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-4",
+      "title": "Průběh připojení FSLogix kontejneru",
+      "type": "network_topology",
+      "content": {
+        "bullet_points": [],
+        "mermaid_diagram": "sequenceDiagram\n    autonumber\n    participant U as Uživatel\n    participant S as FSLogix Služba\n    participant B as SMB Úložiště\n    U->>S: Přihlášení do relace\n    S->>B: Vyhledání VHDX v VHDLocations\n    B-->>S: Připojení virtuálního disku\n    S->>U: Přesměrování C:\\Users\\username na disk"
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-5",
+      "title": "Konfigurace přes Zásady skupiny (GPO)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Správa nastavení pomocí ADMX šablon v GPMC",
+          "Aktivace kontejneru nastavením položky Enabled na 1",
+          "Cesta k úložišti definována v parametru VHDLocations",
+          "Aplikace politik na úrovni počítačů v doméně"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-6",
+      "title": "Klíčové položky registru pro FSLogix",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Cesta v registru",
+            "Název hodnoty",
+            "Význam"
+          ],
+          "rows": [
+            [
+              "HKLM\\SOFTWARE\\FSLogix\\Profiles",
+              "Enabled (DWORD)",
+              "Aktivace profilových kontejnerů (1=Zapnuto)"
+            ],
+            [
+              "HKLM\\SOFTWARE\\FSLogix\\Profiles",
+              "VHDLocations (MULTI_SZ)",
+              "UNC cesta ke sdílenému SMB úložišti"
+            ],
+            [
+              "HKLM\\SOFTWARE\\FSLogix\\Profiles",
+              "VolumeType (REG_SZ)",
+              "Typ virtuálního disku (vhd nebo vhdx)"
+            ],
+            [
+              "HKLM\\SOFTWARE\\FSLogix\\Apps",
+              "VHDCompactDisk (DWORD)",
+              "Automatická komprese disku při odhlášení"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-7",
+      "title": "Pokročilá funkce Cloud Cache",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Umožňuje replikaci VHDX do více úložišť současně",
+          "Zajišťuje vysokou dostupnost při výpadku SMB serveru",
+          "Místní mezipaměť zapisuje změny asynchronně",
+          "Konfigurace přes CCDLocations místo VHDLocations"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-8",
+      "title": "Příkazový řádek a kontrola stavu",
+      "type": "terminal_output",
+      "content": {
+        "bullet_points": [],
+        "terminal": {
+          "command": "reg query HKLM\\SOFTWARE\\FSLogix\\Profiles /v VHDLocations",
+          "output": "HKEY_LOCAL_MACHINE\\SOFTWARE\\FSLogix\\Profiles\n    VHDLocations    REG_MULTI_SZ    \\\\firma.cz\\Profiles"
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-9",
+      "title": "Best Practices pro nasazení FSLogix",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Ukládejte kontejnery na vysokorychlostní SMB úložiště",
+          "Nastavte přiměřené rozsouzení práv k VHDX složkám",
+          "Vylučte dočasná data pomocí redirections.xml",
+          "Pravidelně monitorujte zaplnění diskového prostoru"
+        ]
+      },
+      "teacher_notes": ""
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "white",
+  "sources": [
+    {
+      "title": "FSLogix Apps (základní produkt) - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/fslogix/concepts-fslogix-apps",
+      "kind": "web_page"
+    },
+    {
+      "title": "Možnosti konfigurace – FSLogix - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/fslogix/concepts-configuration-options",
+      "kind": "web_page"
+    },
+    {
+      "title": "Nastavení konfigurace – FSLogix - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/fslogix/reference-configuration-settings",
+      "kind": "web_page"
+    },
+    {
+      "title": "Nejčastější dotazy k FSLogix - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/fslogix/overview-faq",
+      "kind": "web_page"
+    },
+    {
+      "title": "Typy kontejnerů – FSLogix - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/fslogix/concepts-container-types",
+      "kind": "web_page"
+    }
+  ]
+}
