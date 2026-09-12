@@ -1,0 +1,202 @@
+{
+  "title": "Cloud computing a servisní modely",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Co je cloud computing?",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Poskytování výpočetních služeb přes internet na vyžádání.",
+          "Přístup k serverům, úložištím a aplikacím odkudkoliv.",
+          "Platba pouze za skutečně spotřebované zdroje.",
+          "Eliminace nákupu a údržby vlastního hardwaru."
+        ]
+      },
+      "teacher_notes": "Vysvětlete přechod od vlastních datových center k modelu předplatného a služeb na vyžádání."
+    },
+    {
+      "id": "slide-2",
+      "title": "Srovnání IaaS, PaaS a SaaS",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Model",
+            "Co spravuje zákazník",
+            "Příklad použití"
+          ],
+          "rows": [
+            [
+              "IaaS",
+              "OS, aplikaci, data a middleware",
+              "Virtuální servery, blokové úložiště"
+            ],
+            [
+              "PaaS",
+              "Aplikaci a data",
+              "Vývojová prostředí, spravované databáze"
+            ],
+            [
+              "SaaS",
+              "Pouze uživatelské nastavení",
+              "Webový email, M365, Google Workspace"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": "Zdůrazněte rozdělení odpovědnosti mezi zákazníka a poskytovatele cloudu."
+    },
+    {
+      "id": "slide-3",
+      "title": "Infrastruktura jako služba (IaaS)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Pronájem virtualizovaného hardwaru, serverů a sítí.",
+          "Vysoká míra kontroly nad operačním systémem.",
+          "Dynamické škálování výpočetní kapacity podle zátěže.",
+          "Příklady: Amazon EC2, Azure Virtual Machines."
+        ]
+      },
+      "teacher_notes": "IaaS nahrazuje fyzické servery v serverovně virtuálními počítači v cloudu."
+    },
+    {
+      "id": "slide-4",
+      "title": "Platforma (PaaS) a Software (SaaS)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "PaaS poskytuje kompletní prostředí pro vývojáře.",
+          "Vývojář řeší kód, poskytovatel spravuje infrastrukturu.",
+          "SaaS dodává hotové aplikace přístupné přes web.",
+          "Okamžité použití bez nutnosti instalace softwaru."
+        ]
+      },
+      "teacher_notes": "Uveďte rozdíl mezi vývojem aplikace na PaaS a používáním hotové SaaS aplikace."
+    },
+    {
+      "id": "slide-5",
+      "title": "Backend jako služba (BaaS) a Serverless",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "BaaS poskytuje hotové backendové služby přes API.",
+          "Zahrnuje správy databází, autentizaci a push notifikace.",
+          "Serverless umožňuje spouštění kódu bez správy serverů.",
+          "Aplikace automaticky škálují přesně podle požadavků."
+        ]
+      },
+      "teacher_notes": "BaaS šetří čas vývojářům mobilních a webových aplikací při tvorbě serverové části."
+    },
+    {
+      "id": "slide-6",
+      "title": "Modely nasazení cloudu",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Veřejný cloud: sdílená infrastruktura pro více zákazníků.",
+          "Privátní cloud: vyhrazené prostředí pro jednu organizaci.",
+          "Hybridní cloud: propojení veřejného a privátního cloudu.",
+          "Flexibilní volba dle požadavků na bezpečnost."
+        ]
+      },
+      "teacher_notes": "Diskutujte o důvodech, proč banky a zdravotnictví často volí privátní nebo hybridní cloud."
+    },
+    {
+      "id": "slide-7",
+      "title": "Architektura cloudového připojení",
+      "type": "network_topology",
+      "content": {
+        "bullet_points": [],
+        "mermaid_diagram": "graph TD\n    A[Uživatel / Klient] -->|HTTPS / API| B[Cloudový Router / Load Balancer]\n    B --> C[Aplikace - PaaS / SaaS]\n    B --> D[Virtuální Servery - IaaS]\n    D --> E[Cloudové Databázové Úložiště]"
+      },
+      "teacher_notes": "Ukažte tok požadavku klienta přes vyrovnávač zátěže k výpočetní a datové vrstvě."
+    },
+    {
+      "id": "slide-8",
+      "title": "Cloud vs. Edge Computing",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Cloud zpracovává data v centrálních datových centrech.",
+          "Edge computing zpracovává data blízko jejich vzniku.",
+          "Edge snižuje latenci pro IoT a autonomní systémy.",
+          "Kombinace obou přístupů tvoří moderní hybridní architektury."
+        ]
+      },
+      "teacher_notes": "Vysvětlete, proč např. autonomní auta potřebují okamžité zpracování na Edge."
+    },
+    {
+      "id": "slide-9",
+      "title": "Přehled hlavních poskytovatelů",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Poskytovatel",
+            "Klíčové služby",
+            "Zaměření"
+          ],
+          "rows": [
+            [
+              "Amazon AWS",
+              "EC2, S3, Aurora, DynamoDB",
+              "Široké portfolio, globální síť"
+            ],
+            [
+              "Microsoft Azure",
+              "Azure VMs, Blob Storage, Entra ID",
+              "Silná integrace s firemním IT"
+            ],
+            [
+              "Google Cloud",
+              "Compute Engine, App Engine, BigQuery",
+              "Datová analytika a AI"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": "Porovnejte tři největší globální hráče na trhu cloudového hostingu."
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "blue",
+  "sources": [
+    {
+      "title": "Co jsou IaaS, PaaS a SaaS? - Microsoft Azure",
+      "url": "https://azure.microsoft.com/cs-cz/resources/cloud-computing-dictionary/what-are-iaas-paas-and-saas",
+      "kind": "web_url"
+    },
+    {
+      "title": "Co je cloudové úložiště a jak ho využít - Microsoft Azure",
+      "url": "https://azure.microsoft.com/cs-cz/resources/cloud-computing-dictionary/what-is-cloud-storage",
+      "kind": "web_url"
+    },
+    {
+      "title": "Co jsou veřejné, privátní a hybridní cloudy? - Microsoft Azure",
+      "url": "https://azure.microsoft.com/cs-cz/resources/cloud-computing-dictionary/what-are-private-public-hybrid-clouds",
+      "kind": "web_url"
+    },
+    {
+      "title": "Úvod do cloudu: Co je cloud computing je a jak funguje? - ENGETO",
+      "url": "https://engeto.cz/blog/programovani/co-je-cloud-a-jak-funguje-v-praxi/",
+      "kind": "web_url"
+    },
+    {
+      "title": "Cloud vs. edge computing: Jak se mění architektura moderního webu - Interval.cz",
+      "url": "https://www.interval.cz/clanky/edge-computing-vs-cloud-computing-jak-se-meni-architektura-moderniho-webu/",
+      "kind": "web_url"
+    },
+    {
+      "title": "5 nejlepších poskytovatelů cloudového hostingu v roce 2026 - TechNoven",
+      "url": "https://www.technoven.com/cs/5-best-cloud-hosting-providers/",
+      "kind": "web_url"
+    }
+  ]
+}
