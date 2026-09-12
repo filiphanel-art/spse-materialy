@@ -1,0 +1,176 @@
+{
+  "title": "Active Directory Domain Services (AD DS)",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Co je Active Directory Domain Services",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Enterprise adresářová služba pro Windows Server",
+          "Centralizovaná správa identit uživatelů a počítačů",
+          "Ověřování uživatelů pomocí protokolu Kerberos",
+          "Bezpečná správa přístupových práv v síti"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-2",
+      "title": "Struktura AD: Doména, strom a les",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Doména tvoří základní bezpečnostní hranici sítě",
+          "Strom sdružuje domény se souvislým jmenným prostorem",
+          "Les představuje nejvyšší hranici důvěry a schématu",
+          "Automatické obousměrné vztahy důvěry mezi doménami"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Organizační jednotky (OU) a centralizace",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Organizační jednotky tvoří logické složky v doméně",
+          "Přehledné členění uživatelů, počítačů a skupin",
+          "Aplikace Zásad skupiny (GPO) na konkrétní OU",
+          "Delegování správcovských oprávnění pro vybrané složky"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-4",
+      "title": "Hierarchie objektů v Active Directory",
+      "type": "network_topology",
+      "content": {
+        "bullet_points": [],
+        "mermaid_diagram": "graph TD\n    F[Les: firma.cz] --> T1[Strom: firma.cz]\n    T1 --> D1[Kořenová doména: firma.cz]\n    D1 --> OU1[OU: Vedení]\n    D1 --> OU2[OU: IT Oddělení]\n    OU2 --> U1[Uživatel: Jan Novák]\n    OU2 --> P1[Počítač: PC-IT-01]"
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-5",
+      "title": "Řadiče domény (DC) a role PDC Emulator",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "DC uchovává a replikuje databázi Active Directory",
+          "PDC Emulator zajišťuje synchronizaci přesného času",
+          "Správa změn hesel a kompatibilita se staršími systémy",
+          "Garantuje konzistenci dat napříč všemi řadiči"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-6",
+      "title": "Porovnání komponent Active Directory",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Komponenta",
+            "Úroveň v hierarchii",
+            "Hlavní význam"
+          ],
+          "rows": [
+            [
+              "Les (Forest)",
+              "Nejvyšší úroveň",
+              "Hranice bezpečnosti, schématu a konfigurace"
+            ],
+            [
+              "Doména (Domain)",
+              "Místní úroveň",
+              "Hranice pro správu účtů a bezpečnostních zásad"
+            ],
+            [
+              "Organizační jednotka (OU)",
+              "Vnitřní složka",
+              "Strukturování objektů a aplikace GPO zásad"
+            ],
+            [
+              "Řadič domény (DC)",
+              "Fyzický server",
+              "Uchovává databázi a ověřuje uživatele"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-7",
+      "title": "Propojení s Microsoft Entra ID (Hybridní identita)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Microsoft Entra ID spravuje cloudové identity",
+          "Entra Connect synchronizuje místní AD do cloudu",
+          "Jednotné přihlášení (SSO) pro místní i cloudové aplikace",
+          "Centralizovaná správa uživatelů v hybridním prostředí"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-8",
+      "title": "Povyšování serveru na řadič domény",
+      "type": "terminal_output",
+      "content": {
+        "bullet_points": [],
+        "terminal": {
+          "command": "Install-ADDSDomainController -DomainName \"firma.cz\" -Credential (Get-Credential)",
+          "output": "SafeModeAdminPassword: ********\nDomainControllerPromotion : Success\nRestartNeeded : True"
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-9",
+      "title": "Best Practices pro správu AD DS",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Provozujte minimálně dva řadiče domény v síti",
+          "Aplikujte Zásady skupiny na úrovni OU, ne domény",
+          "Pravidelně zálohujte databázi Active Directory",
+          "Zabezpečte privilegované účty a roli PDC Emulator"
+        ]
+      },
+      "teacher_notes": ""
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "white",
+  "sources": [
+    {
+      "title": "Co je Windows Server? | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/overview",
+      "kind": "web_page"
+    },
+    {
+      "title": "Novinky ve Windows Serveru 2025 - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/whats-new-windows-server-2025",
+      "kind": "web_page"
+    },
+    {
+      "title": "Porovnání edic Windows Serveru - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/editions-comparison",
+      "kind": "web_page"
+    },
+    {
+      "title": "Research report: DNS Windows Server",
+      "kind": "markdown"
+    }
+  ]
+}
