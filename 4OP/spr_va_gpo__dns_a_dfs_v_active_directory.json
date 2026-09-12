@@ -1,0 +1,221 @@
+{
+  "title": "Správa GPO, DNS a DFS v Active Directory",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Zásady skupiny (GPO) a jejich architektura",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Centralizovaná správa konfigurací uživatelů a počítačů",
+          "Objekty GPO se ukládají na úrovni domény",
+          "Aplikace pravidel podle pořadí LSDOU",
+          "Umožňuje mapování disků, tiskáren a bezpečnostních nastavení"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-2",
+      "title": "Průvodce správou GPO v GPMC",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Vytvoření nového nepropojeného objektu GPO",
+          "Úprava nastavení pomocí Group Policy Management Editoru",
+          "Propojení GPO na doménu nebo organizační jednotku",
+          "Testování aplikace zásad nástrojem RSOP"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Dědičnost a vynucení Zásad skupiny",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Mechanismus",
+            "Princip fungování",
+            "Dopad na aplikaci GPO"
+          ],
+          "rows": [
+            [
+              "Dědičnost (Inheritance)",
+              "Podřízené OU dědí politiky z nadřazených",
+              "Standardní šíření nastavení shora dolů"
+            ],
+            [
+              "Blokování dědičnosti",
+              "Zastaví průchod politik z vyšších úrovní",
+              "Aplikují se pouze lokální a vynucené GPO"
+            ],
+            [
+              "Enforced (Vynucení)",
+              "Přednostní aplikace bez ohledu na blokování",
+              "GPO má nejvyšší prioritu v celé struktuře"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-4",
+      "title": "DNS v prostředí Active Directory",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Základní služba pro vyhledávání řadičů domény",
+          "SRV záznamy lokalizují služby Kerberos a LDAP",
+          "AD-Integrated zóny se replikují s databází AD",
+          "Zabezpečené dynamické aktualizace chrání před přepsáním"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-5",
+      "title": "Distribuovaný systém souborů (DFS)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "DFS Namespaces sjednocují sdílené složky pod jednu cestu",
+          "DFS Replication zajišťuje synchronizaci dat mezi servery",
+          "Využití algoritmu RDC pro přenos pouze změn",
+          "Zvýšení vysoké dostupnosti a rozložení zátěže"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-6",
+      "title": "Architektura DFS oboru názvů",
+      "type": "network_topology",
+      "content": {
+        "bullet_points": [],
+        "mermaid_diagram": "graph TD\n    Root[\"Doménový kmen: \\\\firma.cz\\Data\"] --> F1[\"Složka: Projekty\"]\n    Root --> F2[\"Složka: Dokumenty\"]\n    F1 --> T1[\"Cíl 1: \\\\SRV01\\Projekty\"]\n    F1 --> T2[\"Cíl 2: \\\\SRV02\\Projekty\"]\n    F2 --> T3[\"Cíl 3: \\\\SRV01\\Dokumenty\"]"
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-7",
+      "title": "Správa SYSVOL a migrace na DFSR",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Složka SYSVOL uchovává skripty a objekty GPO",
+          "Přechod ze zastaralé FRS na replikaci DFSR",
+          "Migrační proces probíhá pomocí nástroje dfsrmig",
+          "Čtyři stavy migrace: Start, Prepared, Redirected, Eliminated"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-8",
+      "title": "Diagnostika a správa přes PowerShell",
+      "type": "terminal_output",
+      "content": {
+        "bullet_points": [],
+        "terminal": {
+          "command": "gpupdate /force; Get-DnsServerZone; Get-DfsnRoot",
+          "output": "Updating policy...\nComputer Policy update has completed successfully.\nUser Policy update has completed successfully.\n\nZoneName        ZoneType        IsDsIntegrated\n--------        --------        --------------\nfirma.cz        Primary         True\n\nPath            Type            State\n----            ----            -----\n\\\\firma.cz\\Data Domain         OK"
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-1789244709175",
+      "title": "Diagnostika GPO: výsledná sada zásad (RSOP)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "RSOP (Resultant Set of Policy) vypočítává a zobrazuje výsledný stav politik aplikovaných na konkrétního uživatele a počítač v doméně.",
+          "Zohledňuje dědičnost, blokování dědičnosti i vynucení (Enforced) napříč různými úrovněmi GPO (lokální, site, doména, OU).",
+          "Ukazuje, která konkrétní konfigurace byla skutečně aplikována a která byla přepsána jinou politikou s vyšší prioritou.",
+          "Grafické rozhraní rsop.msc je již zastaralé. Moderní administrace využívá flexibilnější příkaz gpresult (např. gpresult /h report.html pro export do přehledného webového reportu)."
+        ]
+      },
+      "teacher_notes": "Vysvětlete studentům rozdíl mezi teoretickým nastavením v Group Policy Management Console a realitou na koncové stanici. Zdůrazněte příkaz gpresult /h report.html, který je v praxi administrátora AD naprosto klíčový pro troubleshooting."
+    },
+    {
+      "title": "Co je to složka SYSVOL?",
+      "type": "blocks",
+      "content": {
+        "blocks_style": "grid",
+        "blocks": [
+          {
+            "title": "Účel složky",
+            "text": "Jedná se o speciální sdílenou složku, která existuje na každém doménovém řadiči v síti Active Directory. Slouží k ukládání veřejných souborů domény.",
+            "icon": "📂"
+          },
+          {
+            "title": "Klíčový obsah",
+            "text": "Obsahuje šablony zásad Group Policy (GPO), přihlašovací a odhlašovací skripty uživatelů a další konfigurační soubory.",
+            "icon": "📄"
+          },
+          {
+            "title": "Mechanismus replikace",
+            "text": "Obsah složky SYSVOL musí být identický na všech řadičích. O synchronizaci se stará replikační služba DFSR (dříve zastaralá FRS).",
+            "icon": "🔄"
+          },
+          {
+            "title": "Cesta v systému",
+            "text": "Fyzicky se nachází v adresáři %SystemRoot%\\SYSVOL\\sysvol a v síti je sdílena pod názvem SYSVOL pro všechny ověřené uživatele.",
+            "icon": "💻"
+          }
+        ]
+      },
+      "teacher_notes": "Zdůrazněte studentům, že SYSVOL je kriticky důležitý pro správný chod klientských stanic. Pokud nefunguje replikace SYSVOL, klienti nebudou dostávat aktualizované skupinové politiky (GPO) ani přihlašovací skripty.",
+      "id": "slide-1789244749475"
+    },
+    {
+      "id": "slide-9",
+      "title": "Best Practices pro správa GPO, DNS a DFS",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Aplikujte GPO na organizační jednotky, ne na doménu",
+          "Provozujte integrované AD-DNS zóny na více DC",
+          "Konfigurujte DFS Replication s ohledem na pásmo",
+          "Pravidelně kontrolujte stav replikace složky SYSVOL"
+        ]
+      },
+      "teacher_notes": ""
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "white",
+  "sources": [
+    {
+      "title": "Konzola pro správu zásad skupiny ve Windows - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/identity/ad-ds/manage/group-policy/group-policy-management-console",
+      "kind": "web_page"
+    },
+    {
+      "title": "Research report: DNS Windows Server",
+      "kind": "markdown"
+    },
+    {
+      "title": "Kontrolní seznam Nasazení oborů názvů DFS | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/storage/dfs-namespaces/checklist-deploy-dfs-namespaces",
+      "kind": "web_page"
+    },
+    {
+      "title": "Migrace složky SYSVOL z FRS na technologii replikace DFS | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/storage/dfs-replication/migrate-sysvol-to-dfsr",
+      "kind": "web_page"
+    },
+    {
+      "title": "Group Policy - Mapování síťového disku - Tomáš Kalabis",
+      "url": "https://tomaskalabis.com/wordpress/mapovani-sitoveho-disku-pomoci-gp/",
+      "kind": "web_page"
+    }
+  ]
+}
