@@ -322,7 +322,7 @@
     },
     {
       "id": "slide-9",
-      "title": "Best Practices pro správu DNS",
+      "title": "Doporučení pro správu DNS",
       "type": "theory",
       "content": {
         "bullet_points": [
@@ -337,7 +337,7 @@
   ],
   "template": "op2",
   "show_bullet_markers": true,
-  "op2_color_scheme": "blue",
+  "op2_color_scheme": "white",
   "sources": [
     {
       "title": "Research report: DNS Windows Server",
@@ -363,5 +363,6 @@
       "url": "https://wafatech.sa/blog/windows-server/windows-security/best-practices-for-securing-windows-server-dns/",
       "kind": "web_page"
     }
-  ]
+  ],
+  "watermark_opacity": 0.06
 }
