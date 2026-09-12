@@ -1,0 +1,255 @@
+{
+  "title": "Edice Windows Serveru a Licencování M365",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Přehled edic Windows Serveru",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Windows Server poskytuje infrastrukturu pro podnikové aplikace",
+          "Určen pro fyzická, virtualizovaná i hybridní prostředí",
+          "Dvě hlavní edice: Standard a Datacenter",
+          "Licencování vychází z počtu fyzických jader procesoru"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-2",
+      "title": "Edice Windows Server Standard",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Určeno pro prostředí s nízkou mírou virtualizace",
+          "Zahrnuje právo spustit dva virtuální počítače",
+          "Podporuje všechny základní serverové role a funkce",
+          "Neobsahuje pokročilé funkce jako Storage Spaces Direct"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Edice Windows Server Datacenter",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Určeno pro masivně virtualizovaná podniková datacentra",
+          "Poskytuje neomezená práva pro virtuální počítače",
+          "Obsahuje technologie Úložné prostory Direct a Shielded VMs",
+          "Zahrnuje softwarově definované síťové prvky (SDN)"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-4",
+      "title": "Srovnání edic Standard a Datacenter",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Vlastnost",
+            "Edice Standard",
+            "Edice Datacenter"
+          ],
+          "rows": [
+            [
+              "Práva virtualizace",
+              "2 virtuální počítače (VM)",
+              "Neomezený počet VM"
+            ],
+            [
+              "Storage Spaces Direct",
+              "Neobsahuje",
+              "Plně podporuje"
+            ],
+            [
+              "Softwarové sítě (SDN)",
+              "Neobsahuje",
+              "Plně podporuje"
+            ],
+            [
+              "Shielded Virtual Machines",
+              "Neobsahuje",
+              "Plně podporuje"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-5",
+      "title": "Hybridní propojení s Microsoft Entra ID",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Azure AD Connect synchronizuje lokální Active Directory",
+          "Uživatelé přistupují k lokálním i cloudovým zdrojům",
+          "Jednotné přihlášení (SSO) zvyšuje komfort uživatelů",
+          "Propojení tvoří základ pro cloudové licence M365"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-6",
+      "title": "Licencování Microsoft 365 pro Enterprise",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Plán M365",
+            "Cílová skupina",
+            "Klíčové součásti"
+          ],
+          "rows": [
+            [
+              "Microsoft 365 E3",
+              "Kancelářští pracovníci",
+              "Aplikace Office, Windows Enterprise, EMS"
+            ],
+            [
+              "Microsoft 365 E5",
+              "Pokročilá bezpečnost",
+              "Kompletní E3 + Defender, Purview, Power BI"
+            ],
+            [
+              "Microsoft 365 F3",
+              "Pracovníci v první linii",
+              "Webové aplikace, základní bezpečnost, Teams"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "title": "Microsoft Copilot pro Microsoft 365",
+      "type": "blocks",
+      "content": {
+        "blocks_style": "grid",
+        "blocks": [
+          {
+            "title": "Co je Copilot?",
+            "text": "Asistent založený na AI (LLM), který integruje firemní data z Microsoft Graphu přímo do aplikací balíku Microsoft 365.",
+            "icon": "🤖"
+          },
+          {
+            "title": "Integrace do aplikací",
+            "text": "Funguje ve Wordu (generování textu), Excelu (analýza dat), PowerPointu (tvorba prezentací), Teams (shrnutí schůzek) a Outlooku.",
+            "icon": "💼"
+          },
+          {
+            "title": "Bezpečnost a data",
+            "text": "Firemní data neopouštějí tenant organizace, nejsou použita pro trénování veřejných modelů a respektují nastavená oprávnění.",
+            "icon": "🔒"
+          },
+          {
+            "title": "Licenční model",
+            "text": "Jedná se o volitelnou doplňkovou licenci (add-on), která vyžaduje základní plán (např. Business Standard/Premium, E3/E5, A3/A5).",
+            "icon": "💳"
+          }
+        ]
+      },
+      "teacher_notes": "Vysvětlete studentům rozdíl mezi bezplatným webovým Copilotem a plným Microsoft Copilot pro M365, který přistupuje k interním dokumentům přes Microsoft Graph.",
+      "id": "slide-1789245583022"
+    },
+    {
+      "id": "slide-7",
+      "title": "Licencování Microsoft 365 pro Školy (Education)",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Plán M365",
+            "Určení",
+            "Hlavní výhody"
+          ],
+          "rows": [
+            [
+              "Microsoft 365 A1",
+              "Základní školní licence",
+              "Webové aplikace Office zdarma pro školy"
+            ],
+            [
+              "Microsoft 365 A3",
+              "Standardní výuka",
+              "Desktopové aplikace Office, Minecraft Education"
+            ],
+            [
+              "Microsoft 365 A5",
+              "Kompletní zabezpečení",
+              "Vše z A3 + pokročilá analytika a bezpečnost"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-8",
+      "title": "Instalace a licence přes PowerShell",
+      "type": "terminal_output",
+      "content": {
+        "bullet_points": [],
+        "terminal": {
+          "command": "Get-WindowsEdition -Online; DISM /Online /Get-CurrentEdition",
+          "output": "Edition : ServerStandard\nDescription : Windows Server Standard\n\nCurrent Edition : ServerStandard\nTarget Edition : ServerDatacenter"
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-9",
+      "title": "Best Practices pro výběr licencí",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Spočítejte fyzická jádra serveru pro správný nákup",
+          "Zvolte Datacenter při plánování více než deseti VM",
+          "Využijte školní výhody M365 A1 až A5 pro ušetření",
+          "Synchronizujte identity pomocí Azure AD Connect pro M365"
+        ]
+      },
+      "teacher_notes": ""
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "white",
+  "sources": [
+    {
+      "title": "Porovnání edic Windows Serveru - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/editions-comparison",
+      "kind": "web_page"
+    },
+    {
+      "title": "Co je Windows Server? | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/overview",
+      "kind": "web_page"
+    },
+    {
+      "title": "Porovnání služby Active Directory s ID Microsoft Entra",
+      "url": "https://learn.microsoft.com/cs-cz/azure/active-directory/fundamentals/compare",
+      "kind": "web_page"
+    },
+    {
+      "title": "Azure AD Connect a replikace účtů z On-Premises AD DS",
+      "url": "https://www.samuraj-cz.com/clanek/azure-ad-connect-a-replikace-uctu-zon-premises-ad-ds/",
+      "kind": "web_page"
+    },
+    {
+      "title": "Plánování cesty upgradu Windows Server | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/install-upgrade-migrate",
+      "kind": "web_page"
+    }
+  ]
+}
