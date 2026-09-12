@@ -1,0 +1,205 @@
+{
+  "title": "Microsoft Azure a tvorba virtuálních strojů",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Co je Azure virtual machine (VM)?",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Virtuální stroje tvoří základní IaaS službu Azure.",
+          "Poskytují škálovatelný výpočetní výkon na vyžádání.",
+          "Podporují operační systémy Windows Server i Linux.",
+          "Fungují bez nutnosti nákupu fyzického hardwaru."
+        ]
+      },
+      "teacher_notes": "Vysvětlete pojem IaaS a výhodu virtualizace v cloudu oproti fyzickým serverům."
+    },
+    {
+      "id": "slide-2",
+      "title": "Hlavní komponenty virtuálního stroje",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Komponenta",
+            "Funkce v Azure",
+            "Příklad / Možnost"
+          ],
+          "rows": [
+            [
+              "Výpočetní výkon",
+              "Přiřazení vCPU a RAM paměti",
+              "Série B, D, E dle zátěže"
+            ],
+            [
+              "Úložiště",
+              "Virtualizovaný disk OS a dat",
+              "Managed Disks (SSD / HDD)"
+            ],
+            [
+              "Síťová karta (NIC)",
+              "Propojení VM s virtuální sítí",
+              "Privátní a veřejná IP"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": "Zdůrazněte, že VM se skládá z několika samostatně účtovaných a spravovaných prostředků."
+    },
+    {
+      "id": "slide-3",
+      "title": "Prerekvizity před vytvořením VM",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Resource Group sdružuje související cloudové prostředky.",
+          "Volba regionu určuje fyzické datové centrum.",
+          "Virtuální síť VNet zajišťuje bezpečnou komunikaci.",
+          "Network Security Group funguje jako cloudový firewall."
+        ]
+      },
+      "teacher_notes": "Vysvětlete význam Resource Group pro logické členění a správu životního cyklu."
+    },
+    {
+      "id": "slide-4",
+      "title": "Postup vytvoření VM v Azure Portalu",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Přihlášení do správy přes Azure Portal.",
+          "Výběr typu OS a požadovaného výpočetního výkonu.",
+          "Nastavení správcovského účtu a hesla nebo klíče.",
+          "Konfigurace povolených příchozích portů pro správu."
+        ]
+      },
+      "teacher_notes": "Projděte základní záložky průvodce nasazením virtuálního počítače."
+    },
+    {
+      "id": "slide-5",
+      "title": "Zabezpečení síťového obvodu",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Network Security Group řídí síťový provoz.",
+          "Definice pravidel pro příchozí a odchozí komunikaci.",
+          "Povolení portu 3389 pro přístup přes RDP.",
+          "Povolení portu 22 pro šifrovaný SSH přístup."
+        ]
+      },
+      "teacher_notes": "Upozorněte na bezpečnostní rizika otevření správcovských portů do do celé sítě internet."
+    },
+    {
+      "id": "slide-6",
+      "title": "Topologie zapojení VM v cloudu",
+      "type": "network_topology",
+      "content": {
+        "bullet_points": [],
+        "mermaid_diagram": "graph TD\n    A[Správce / Uživatel] -->|RDP 3389 / SSH 22| B[Veřejná IP adresa]\n    B --> C[Network Security Group - NSG]\n    C --> D[Virtuální síťová karta - NIC]\n    D --> E[Subnet / Virtuální síť VNet]\n    E --> F[Azure Virtual Machine]\n    F --> G[Spravovaný disk - Managed OS Disk]"
+      },
+      "teacher_notes": "Vysvětlete průchod síťového požadavku přes bezpečnostní vrstvu až k samotné VM."
+    },
+    {
+      "id": "slide-7",
+      "title": "Možnosti připojení a správy",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Připojení k Windows pomocí Vzdálené plochy RDP.",
+          "Připojení k Linuxu přes protokol SSH.",
+          "Možnost automatizace pomocí Azure CLI a PowerShellu.",
+          "Průběžný dohled nad výkonem v Azure Monitor."
+        ]
+      },
+      "teacher_notes": "Demonstrujte rozdíl mezi grafickým přihlášením na Windows a terminálovým přístupem na Linux."
+    },
+    {
+      "id": "slide-8",
+      "title": "Správa nákladů a úsporná opatření",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Platba pouze za dobu reálného běhu VM.",
+          "Možnost úspory pomocí rezervace na 1 až 3 roky.",
+          "Automatické vypínání strojů mimo pracovní dobu.",
+          "Využití stávajících licencí s Azure Hybrid Benefit."
+        ]
+      },
+      "teacher_notes": "Vysvětlete rozdíl mezi vypnutím OS uvnitř VM a zastavením (Deallocated) na portálu Azure."
+    },
+    {
+      "id": "slide-9",
+      "title": "Příklady využití podle řad VM",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Scénář použití",
+            "Doporučená řada VM",
+            "Klíčová výhoda"
+          ],
+          "rows": [
+            [
+              "Vývoj a testování",
+              "B-series (Burstable)",
+              "Nízké náklady při proměnlivé zátěži"
+            ],
+            [
+              "Webové servery",
+              "D-series (General Purpose)",
+              "Vyvážený poměr CPU a paměti RAM"
+            ],
+            [
+              "Databáze a analytika",
+              "E-series (Memory Optimized)",
+              "Vysoká kapacita operační paměti"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": "Ukažte, jak správná volba řady VM ovlivňuje výkon i celkovou cenu."
+    },
+    {
+      "id": "slide-1789243955447",
+      "title": "Regiony a možnost VM zdarma",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Azure Region: geografická lokalita s datovými centry, která ovlivňuje latenci, cenu a legislativu dat. Pro ČR je nejvhodnější volbou West Europe.",
+          "Virtuální stroj zdarma: s Azure for Students získáte možnost provozovat VM řady B1s (1 vCPU, 1 GB RAM) zdarma po dobu 12 měsíců s limitem 750 hodin měsíčně.",
+          "Důležitá omezení: bezplatný provoz platí pouze pro specifické velikosti a vybrané regiony. Při nevhodné volbě (např. řady D-series) dochází k okamžitému čerpání kreditů."
+        ]
+      },
+      "teacher_notes": "Zdůrazněte studentům, že při zakládání studentského účtu (Azure for Students) získají 100 USD kredit a přístup k vybraným službám zdarma bez nutnosti zadávat platební kartu. Při tvorbě VM musí explicitně vybrat velikost Standard_B1s a správný region (např. West Europe), aby byl stroj krytý bezplatnou nabídkou."
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "blue",
+  "sources": [
+    {
+      "title": "Co jsou IaaS, PaaS a SaaS? - Microsoft Azure",
+      "url": "https://azure.microsoft.com/cs-cz/resources/cloud-computing-dictionary/what-are-iaas-paas-and-saas",
+      "kind": "web_url"
+    },
+    {
+      "title": "5 nejlepších poskytovatelů cloudového hostingu v roce 2026: Který je lepší? - TechNoven",
+      "url": "https://www.technoven.com/cs/5-best-cloud-hosting-providers/",
+      "kind": "web_url"
+    },
+    {
+      "title": "Co je MICROSOFT Entra ID? - Microsoft Entra | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/azure/active-directory/fundamentals/whatis",
+      "kind": "web_url"
+    },
+    {
+      "title": "Co je cloudové úložiště a jak ho využít - Microsoft Azure",
+      "url": "https://azure.microsoft.com/cs-cz/resources/cloud-computing-dictionary/what-is-cloud-storage",
+      "kind": "web_url"
+    }
+  ]
+}
