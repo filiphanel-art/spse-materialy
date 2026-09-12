@@ -273,13 +273,13 @@
         "bullet_points": [
           "Autoritativní server spravuje originální data zóny",
           "Poskytuje konečné a závazné odpovědi pro doménu",
-          "Neautoritativní server: forwardovací, cashovací, rekurzivní"
+          "Neautoritativní server: forwardovací, cashovací/rekurzivní"
         ]
       },
       "teacher_notes": ""
     },
     {
-      "title": "Rekurzivní  (cashovací) DNS server",
+      "title": "Rekurzivní cash DNS server",
       "type": "theory",
       "content": {
         "bullet_points": [
