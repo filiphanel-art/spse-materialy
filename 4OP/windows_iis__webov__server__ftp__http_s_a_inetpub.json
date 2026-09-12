@@ -1,0 +1,180 @@
+{
+  "title": "Windows IIS: Webový Server, FTP, HTTP/S a inetpub",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Co je Internet Information Services (IIS)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Webová serverová role v operačním systému Windows Server",
+          "Hosting webových stránek, aplikací a webových služeb",
+          "Podpora protokolů HTTP, HTTPS, FTP a FTPS",
+          "Integrovaná správa přes konzoli IIS Manager"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-2",
+      "title": "Struktura složky inetpub a wwwroot",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Výchozí kořenový adresář C:\\inetpub pro webový obsah",
+          "Podadresář wwwroot uchovává veřejné webové soubory",
+          "Složka ftproot slouží jako kořen FTP serveru",
+          "Složka logs uchovává provozní protokoly serveru"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Protokoly HTTP, HTTPS a certifikáty",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Protokol",
+            "Standardní port",
+            "Zabezpečení a šifrování"
+          ],
+          "rows": [
+            [
+              "HTTP",
+              "Port 80",
+              "Nešifrovaný přenos textových dat"
+            ],
+            [
+              "HTTPS",
+              "Port 443",
+              "Šifrování pomocí TLS / SSL certifikátu"
+            ],
+            [
+              "FTP",
+              "Port 21",
+              "Přenos souborů a řídicí komunikace"
+            ],
+            [
+              "FTPS",
+              "Port 990 / 21",
+              "Zabezpečený přenos souborů přes TLS"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-4",
+      "title": "Vazby webu (Bindings) a Host Headers",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Vazba určuje IP adresu, port a záhlaví hostitele",
+          "Umožňuje běh více webů na jedné IP adrese",
+          "Rozlišování webů podle názvu domény (Host Header)",
+          "Přiřazení TLS certifikátu k příslušné HTTPS vazbě"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-5",
+      "title": "Architektura procesů IIS a application pools",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Kernelový ovladač HTTP.sys přijímá síťové požadavky",
+          "Pracovní proces w3wp.exe zpracovává kód aplikace",
+          "Application Pool izoluje aplikace od ostatních webů",
+          "Zvýšení stability a bezpečnosti při selhání procesu"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-6",
+      "title": "Služba FTP a zabezpečený přenos",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Součást role Web Server pro přenos souborů",
+          "Podpora izolace uživatelů v adresářích FTP",
+          "Autentizace pomocí účtů Windows nebo IIS účtů",
+          "Šifrování přihlášení a dat pomocí protokolu FTPS"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-7",
+      "title": "Instalace role IIS v PowerShellu",
+      "type": "terminal_output",
+      "content": {
+        "bullet_points": [],
+        "terminal": {
+          "command": "Install-WindowsFeature -Name Web-Server, Web-Ftp-Server -IncludeManagementTools",
+          "output": "Success RestartNeeded ExitCode FeatureResult\n------- ------------- -------- -------------\nTrue    No            Success  {Web-Server, Web-WebServer, Web-Ftp-Server...}"
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-8",
+      "title": "Správa IIS a webů v PowerShellu",
+      "type": "code_walkthrough",
+      "content": {
+        "bullet_points": [],
+        "code": {
+          "language": "powershell",
+          "highlight_lines": "",
+          "snippet": "# Načtení modulu pro správu IIS\nImport-Module WebAdministration\n\n# Vytvoření nového webu\nNew-WebSite -Name \"SkolniWeb\" -Port 80 -PhysicalPath \"C:\\inetpub\\wwwroot\\SkolniWeb\" -HostHeader \"web.skola.cz\"\n\n# Vytvoření nového Application Poolu\nNew-WebAppPool -Name \"SkolniAppPool\"\nSet-ItemProperty \"IIS:\\AppPools\\SkolniAppPool\" -Name \"managedRuntimeVersion\" -Value \"v4.0\""
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-9",
+      "title": "Best Practices pro zabezpečení IIS",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Provozujte každý web v samostatném Application Poolu",
+          "Vynucujte protokol HTTPS a vypněte staré verze TLS",
+          "Nastavte striktní NTFS oprávnění pro složku inetpub",
+          "Pravidelně kontrolujte a analyzujte soubory protokolů"
+        ]
+      },
+      "teacher_notes": ""
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "white",
+  "sources": [
+    {
+      "title": "Porovnání edic Windows Serveru - Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/editions-comparison",
+      "kind": "web_page"
+    },
+    {
+      "title": "Co je Windows Server? | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/windows-server/get-started/overview",
+      "kind": "web_page"
+    },
+    {
+      "title": "Server Hardening Checklist Introduction Windows IIS Server hardening checklist - OntarioMD",
+      "kind": "pdf"
+    },
+    {
+      "title": "Group Policy - Mapování síťového disku - Tomáš Kalabis",
+      "url": "https://tomaskalabis.com/wordpress/mapovani-sitoveho-disku-pomoci-gp/",
+      "kind": "web_page"
+    }
+  ]
+}
