@@ -1,0 +1,202 @@
+{
+  "title": "Microsoft Entra ID a propojení s Active Directory",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Co je Microsoft Entra ID?",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Cloudová služba pro správu identit a přístupu.",
+          "Přejmenovaný nástroj původně známý jako Azure AD.",
+          "Zabezpečuje přihlašování k M365, Azure i SaaS.",
+          "Základní stavební kámen architektury Zero Trust."
+        ]
+      },
+      "teacher_notes": "Vysvětlete přejmenování z Azure AD na Microsoft Entra ID a hlavní účel cloudového zprostředkovatele identity."
+    },
+    {
+      "id": "slide-2",
+      "title": "Srovnání AD DS a Microsoft Entra ID",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Vlastnost",
+            "Místní AD DS",
+            "Cloudové Microsoft Entra ID"
+          ],
+          "rows": [
+            [
+              "Protokoly",
+              "Kerberos, NTLM, LDAP",
+              "SAML, OAuth 2.0, OpenID Connect"
+            ],
+            [
+              "Struktura",
+              "Hierarchická (OU, domény)",
+              "Plochá struktura (skupiny a role)"
+            ],
+            [
+              "Správa zařízení",
+              "Objekty GPO a řadiče domény",
+              "MDM (Intune) a podmíněný přístup"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": "Zdůrazněte, že Entra ID není pouhý řadič domény v cloudu, ale moderní HTTP/HTTPS řešení identit."
+    },
+    {
+      "id": "slide-3",
+      "title": "Složky produktové rodiny Microsoft Entra",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Entra ID správa uživatelů a přístupových práv.",
+          "Entra Connect synchronizace místního AD s cloudem.",
+          "Entra Private a Internet Access pro připojení.",
+          "Entra Verified ID decentralizovaná správa přihlašovacích údajů."
+        ]
+      },
+      "teacher_notes": "Představte širší ekosystém Microsoft Entra pokrývající identitu, síť i zásady správného řízení."
+    },
+    {
+      "id": "slide-4",
+      "title": "Hybridní identita a Entra Connect",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Jednotná identita pro místní i cloudové zdroje.",
+          "Synchronizace uživatelů a skupin z Windows AD.",
+          "Pass-through authentication nebo synchronizace hesel (PHS).",
+          "Podpora jednotného přihlašování Seamless SSO."
+        ]
+      },
+      "teacher_notes": "Vysvětlete, jak firmy propojují stávající infrastrukturu s cloudem bez nutnosti tvořit duplicitní účty."
+    },
+    {
+      "id": "slide-5",
+      "title": "Topologie synchronizace hesel a identit",
+      "type": "network_topology",
+      "content": {
+        "bullet_points": [],
+        "mermaid_diagram": "graph TD\n    A[Místní Active Directory DS] -->|Entra Connect Sync| B[Microsoft Entra ID Tenant]\n    B --> C[Microsoft 365 / SaaS Aplikace]\n    B --> D[Azure Cloud Prostředky]\n    U[Uživatel / Klient] -->|OAuth / SAML| B"
+      },
+      "teacher_notes": "Popište tok dat při synchronizaci uživatelských objektů z on-premise prostředí do cloudu."
+    },
+    {
+      "id": "slide-6",
+      "title": "Podmíněný přístup (Conditional Access)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Vyhodnocování rizikových signálů v reálném čase.",
+          "Vynucení vícefaktorového ověřování (MFA) dle kontextu.",
+          "Restrikce přístupu na základě lokace či zařízení.",
+          "Implementace bezpečnostního principu Zero Trust."
+        ]
+      },
+      "teacher_notes": "Vysvětlete pravidlo 'never trust, always verify' a jak Conditional Access řídí přístup na základě podmínek."
+    },
+    {
+      "id": "slide-7",
+      "title": "Samoobslužné resetování hesla (SSPR)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Uživatelé si sami bezpečně resetují hesla.",
+          "Výrazné snížení počtu požadavků na IT helpdesk.",
+          "Zpětný zápis hesel (Password Writeback) do AD.",
+          "Ověření pomocí mobilní aplikace, SMS či emailu."
+        ]
+      },
+      "teacher_notes": "Ukažte přínos SSPR pro snížení zátěže podpory a vysvětlete funkci zpětného zápisu do on-premise AD."
+    },
+    {
+      "id": "slide-8",
+      "title": "Přehled licenčních edicí",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Licence",
+            "Klíčové funkce",
+            "Vhodné pro"
+          ],
+          "rows": [
+            [
+              "Entra ID Free",
+              "Základní SSO, správa uživatelů, cloudová SSPR",
+              "Základní cloudové scénáře"
+            ],
+            [
+              "Entra ID P1",
+              "Hybridní identita, SSPR se zpětným zápisem, CA",
+              "Střední firmy s hybridním IT"
+            ],
+            [
+              "Entra ID P2",
+              "Identity Protection na bázi AI, PIM správa rolí",
+              "Enterprise a vysoké nároky na bezpečnost"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": "Porovnejte bezplatnou edici s prémiovými licencemi P1 a P2."
+    },
+    {
+      "id": "slide-9",
+      "title": "Auditování a monitorování v Log Analytics",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Sledování přihlašovacích protokolů a auditu změn.",
+          "Detekce neobvyklých přihlášení a rizikových aktivit.",
+          "Integrace s Azure Monitor a Microsoft Sentinel.",
+          "Dotazování pomocí Kusto Query Language (KQL)."
+        ]
+      },
+      "teacher_notes": "Vysvětlete význam centrálního monitorování a analýzy bezpečnostních událostí."
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "blue",
+  "sources": [
+    {
+      "title": "Co je MICROSOFT Entra ID? - Microsoft Entra | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/azure/active-directory/fundamentals/whatis",
+      "kind": "web_url"
+    },
+    {
+      "title": "Co je Microsoft Entra? - Microsoft Entra | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/entra/fundamentals/what-is-entra",
+      "kind": "web_url"
+    },
+    {
+      "title": "Nový název pro Azure Active Directory - Microsoft Entra | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/entra/fundamentals/new-name",
+      "kind": "web_url"
+    },
+    {
+      "title": "Vysvětlení ID Microsoft Entra - Software Levně CZ",
+      "url": "https://www.software-levne.cz/learning/vysvetleni-id-microsoft-entra/",
+      "kind": "web_url"
+    },
+    {
+      "title": "Povolení samoobslužného resetování hesla Microsoft Entra - Microsoft Entra ID | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/entra/identity/authentication/tutorial-enable-sspr",
+      "kind": "web_url"
+    },
+    {
+      "title": "Správa uživatelů a skupin v Microsoft Entra ID - Training | Microsoft Learn",
+      "url": "https://learn.microsoft.com/cs-cz/training/modules/manage-users-and-groups-in-aad/",
+      "kind": "web_url"
+    }
+  ]
+}
