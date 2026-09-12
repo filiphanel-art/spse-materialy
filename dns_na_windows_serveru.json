@@ -1,0 +1,367 @@
+{
+  "title": "DNS na Windows Serveru",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Princip a hierarchie DNS",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Překlad doménových jmen na IP adresy",
+          "Distribuovaná databáze se stromovou strukturou",
+          "TLD (Top-Level Domain) - domény nejvyšší úrovně (např. .cz, .com) stojící v hierarchii hned pod kořenovou doménou",
+          "Klientský resolver hledá nejprve v mezipaměti (cash)"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Definice domény a zóny",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Doména: logická větev v hierarchickém jmenném prostoru DNS, která určuje strukturu a hranice pojmenování.",
+          "Zóna: fyzicky spravovaná část databáze DNS (uložená v zónovém souboru nebo v Active Directory) obsahující konkrétní datové záznamy."
+        ]
+      },
+      "teacher_notes": "Zdůrazněte žákům rozdíl mezi logickým pojmem (doména) a fyzickým datovým souborem/správou (zóna)."
+    },
+    {
+      "id": "slide-1789226772707",
+      "title": "Průběh DNS dotazu",
+      "type": "blocks",
+      "content": {
+        "blocks_style": "timeline",
+        "blocks": [
+          {
+            "title": "1. Dotaz klienta (Rekurzivní)",
+            "text": "Klient (počítač/prohlížeč) pošle dotaz na požadované jméno svému nakonfigurovanému DNS resolveru.",
+            "icon": "💻"
+          },
+          {
+            "title": "2. Kontrola mezipaměti (Cache)",
+            "text": "Resolver zkontroluje lokální cache. Pokud záznam existuje a je platný, ihned vrátí IP adresu.",
+            "icon": "⚡"
+          },
+          {
+            "title": "3. Kořenový server (Root DNS)",
+            "text": "Pokud adresa v cache není, resolver se zeptá Root DNS serveru, který jej odkáže na příslušný TLD server (např. pro doménu .cz).",
+            "icon": "🌐"
+          },
+          {
+            "title": "4. TLD a Autoritativní server",
+            "text": "TLD server odkáže resolver na autoritativní DNS server dané domény, který vrátí finální IP adresu.",
+            "icon": "🎯"
+          }
+        ]
+      },
+      "teacher_notes": "Vysvětlete žákům rozdíl mezi rekurzivním dotazem (klient vůči resolveru) a iterativním dotazem (resolver vůči Root, TLD a autoritativním serverům)."
+    },
+    {
+      "id": "slide-1789224972260-7",
+      "title": "Root servery",
+      "type": "image",
+      "content": {
+        "bullet_points": [
+          "Stojí na samotném vrcholu DNS hierarchie (představují kořenový uzel dotazů)",
+          "Existuje 13 hlavních logických autorit (označených písmeny A až M)",
+          "Neuchovávají adresy konkrétních domén, ale odkazují na příslušné TLD servery (např. pro .cz, .com)"
+        ],
+        "images": [
+          {
+            "url": "https://www.cloudflare.com/img/learning/dns/glossary/dns-root-server/dns-root-server.png",
+            "caption": "13 root serverů a jejich Anycast distribuované uzly"
+          }
+        ]
+      },
+      "teacher_notes": "Vysvětlete studentům rozdíl mezi 13 logickými adresami a reálným počtem fyzických serverů rozprostřených po světě díky Anycast routingu."
+    },
+    {
+      "id": "slide-1789226832100",
+      "title": "13 kořenových DNS serverů",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Jméno",
+            "Operátor / Organizace",
+            "IPv4 adresa",
+            "IPv6 adresa"
+          ],
+          "rows": [
+            [
+              "A.ROOT-SERVERS.NET",
+              "Verisign, Inc.",
+              "198.41.0.4",
+              "2001:503:ba3e::2:30"
+            ],
+            [
+              "B.ROOT-SERVERS.NET",
+              "USC-ISI",
+              "199.9.14.201",
+              "2001:500:200::b"
+            ],
+            [
+              "C.ROOT-SERVERS.NET",
+              "Cogent Communications",
+              "192.33.4.12",
+              "2001:500:2::c"
+            ],
+            [
+              "D.ROOT-SERVERS.NET",
+              "University of Maryland",
+              "199.7.91.13",
+              "2001:500:2d::d"
+            ],
+            [
+              "E.ROOT-SERVERS.NET",
+              "NASA Ames Research Center",
+              "192.203.230.10",
+              "2001:500:a8::e"
+            ],
+            [
+              "F.ROOT-SERVERS.NET",
+              "Internet Systems Consortium",
+              "192.5.5.241",
+              "2001:500:2f::f"
+            ],
+            [
+              "G.ROOT-SERVERS.NET",
+              "US DoD NIC",
+              "192.112.36.4",
+              "2001:500:12::d0d"
+            ],
+            [
+              "H.ROOT-SERVERS.NET",
+              "US Army Research Lab",
+              "198.97.190.53",
+              "2001:500:1::803f:235"
+            ],
+            [
+              "I.ROOT-SERVERS.NET",
+              "Netnod",
+              "192.36.148.17",
+              "2001:7fe::53"
+            ],
+            [
+              "J.ROOT-SERVERS.NET",
+              "Verisign, Inc.",
+              "192.58.128.30",
+              "2001:503:c27::2:30"
+            ],
+            [
+              "K.ROOT-SERVERS.NET",
+              "RIPE NCC",
+              "193.0.14.129",
+              "2001:7fd::1"
+            ],
+            [
+              "L.ROOT-SERVERS.NET",
+              "ICANN",
+              "199.7.83.42",
+              "2001:500:9f::42"
+            ],
+            [
+              "M.ROOT-SERVERS.NET",
+              "WIDE Project",
+              "202.12.27.33",
+              "2001:dc3::29"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": "Vysvětlete žákům, že ačkoliv existuje pouze 13 IP adres/jmen pro root servery (omezení velikosti UDP paketu), v reálném světě funguje díky technologii Anycast tisíce fyzických serverů po celém světě se stejnými IP adresami."
+    },
+    {
+      "id": "slide-4",
+      "title": "Dopředná a zpětná zóna",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Typ zóny",
+            "Směr překladu",
+            "Hlavní záznam"
+          ],
+          "rows": [
+            [
+              "Dopředná (Forward)",
+              "Jméno -> IP adresa",
+              "A / AAAA"
+            ],
+            [
+              "Zpětná (Reverse)",
+              "IP adresa -> Jméno",
+              "PTR (in-addr.arpa)"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-1789224853109",
+      "title": "Přehled základních typů DNS záznamů",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Typ",
+            "Název",
+            "Význam / Funkce",
+            "Příklad hodnoty"
+          ],
+          "rows": [
+            [
+              "A",
+              "Address Record",
+              "Mapuje doménové jméno na IPv4 adresu",
+              "192.168.1.50"
+            ],
+            [
+              "AAAA",
+              "IPv6 Address Record",
+              "Mapuje doménové jméno na IPv6 adresu",
+              "2001:db8::10"
+            ],
+            [
+              "CNAME",
+              "Canonical Name",
+              "Alias odkazující na jiné doménové jméno",
+              "web.skola.local"
+            ],
+            [
+              "MX",
+              "Mail Exchange",
+              "Určuje poštovní server pro doménu",
+              "mail.skola.local"
+            ],
+            [
+              "PTR",
+              "Pointer Record",
+              "Reverzní záznam (převod IP adresy na jméno)",
+              "server1.skola.local"
+            ],
+            [
+              "NS",
+              "Name Server",
+              "Určuje autoritativní DNS server pro zónu",
+              "dc1.skola.local"
+            ],
+            [
+              "SOA",
+              "Start of Authority",
+              "Obsahuje základní správy a parametry zóny",
+              "dc1.skola.local. admin..."
+            ]
+          ]
+        }
+      },
+      "teacher_notes": "Projděte se žáky jednotlivé typy záznamů. Zdůrazněte rozdíl mezi A a CNAME a vysvětlete, k čemu se používá PTR záznam v reverzních zónách."
+    },
+    {
+      "id": "slide-5",
+      "title": "Autoritativní vs. neautoritativní server",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Autoritativní server spravuje originální data zóny",
+          "Poskytuje konečné a závazné odpovědi pro doménu",
+          "Neautoritativní server: forwardovací, cashovací, rekurzivní"
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "title": "Rekurzivní  (cashovací) DNS server",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Přijímá dotazy od klientů (resolverů) a přebírá plnou odpovědnost za vyřešení doménového jména",
+          "Pokud nemá odpověď ve vyrovnávací paměti (cache), provádí dotazy na kořenové, TLD a autoritativní servery",
+          "Získanou finální IP adresu si uloží do cache pro další použití a vrátí ji klientovi",
+          "Výrazně zrychluje opakované dotazy v síti a snižuje datový provoz do internetu",
+          "V prostředí Windows Serveru funguje služba DNS standardně jako rekurzivní resolver"
+        ]
+      },
+      "teacher_notes": "Vysvětlete žákům rozdíl mezi rekurzivním dotazem (klient deleguje práci na DNS server) a iterativním dotazováním (rekurzivní server postupně prochází strom DNS od root serverů až po autoritativní).",
+      "id": "slide-1789228529931"
+    },
+    {
+      "id": "slide-7",
+      "title": "Forwardovacího serveru (Forwarder)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Forwarder je DNS server určený k přeposílání dotazů na nadřazené externí DNS servery",
+          "Využívá se v případě, kdy lokální server nezná odpověď a nedotazuje se přímo kořenových serverů",
+          "Zrychluje vyřizování dotazů a šetří pásmo díky efektivnímu využívání vyrovnávací paměti (cache)",
+          "Zvyšuje bezpečnost sítě, protože do internetu dává DNS dotazy pouze tento vyhrazený server",
+          "Příklad: 1.1.1.1, 8.8.8.8, 8.8.4.4"
+        ]
+      },
+      "teacher_notes": "Vysvětlete žákům rozdíl mezi běžnou rekurzí pomocí Root Hints a využitím Forwarderu (např. předávání na veřejné servery Cloudflare 1.1.1.1 nebo Google 8.8.8.8)."
+    },
+    {
+      "id": "slide-1789224827481",
+      "title": "Primární a sekundární DNS",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Primární zóna: obsahuje originální zapisovatelnou kopii DNS databáze. Změny se provádí přímo na tomto serveru.",
+          "Sekundární zóna: kopie pouze pro čtení (read-only). Slouží k rozložení zátěže dotazů a zajištění vysoké dostupnosti."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-9",
+      "title": "Best Practices pro správu DNS",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Provozujte minimálně dva interní DNS servery",
+          "Používejte zóny integrované v Active Directory",
+          "Doménoví klienti směrují dotazy pouze interně",
+          "Aktivujte automatické čištění neaktivních záznamů"
+        ]
+      },
+      "teacher_notes": ""
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "blue",
+  "sources": [
+    {
+      "title": "Research report: DNS Windows Server",
+      "kind": "markdown"
+    },
+    {
+      "title": "Quickstart: Install and configure DNS Server on Windows Server",
+      "url": "https://learn.microsoft.com/en-us/windows-server/networking/dns/quickstart-install-configure-dns-server",
+      "kind": "web_page"
+    },
+    {
+      "title": "DNS Best Practices: The Definitive Guide",
+      "url": "https://activedirectorypro.com/dns-best-practices/",
+      "kind": "web_page"
+    },
+    {
+      "title": "Best practices for DNS client settings in Windows Server",
+      "url": "https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/best-practices-for-dns-client-settings",
+      "kind": "web_page"
+    },
+    {
+      "title": "Best Practices for Securing Windows Server DNS",
+      "url": "https://wafatech.sa/blog/windows-server/windows-security/best-practices-for-securing-windows-server-dns/",
+      "kind": "web_page"
+    }
+  ]
+}
