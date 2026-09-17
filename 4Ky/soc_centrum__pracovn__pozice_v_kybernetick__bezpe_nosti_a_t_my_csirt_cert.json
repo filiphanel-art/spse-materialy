@@ -1,0 +1,186 @@
+{
+  "title": "SOC centrum, pracovní pozice v kybernetické bezpečnosti a týmy CSIRT/CERT",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Bezpečnostní dohledové centrum (SOC)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Nepřetržitý dohled nad ICT infrastrukturou organizace.",
+          "Proaktivní detekce a vyhodnocování bezpečnostních hrozeb.",
+          "Propojení lidí, procesů a pokročilých technologií.",
+          "Příklad: 24/7 monitoring síťového provozu podniku."
+        ]
+      },
+      "teacher_notes": "Vysvětlete význam SOC jako centrálního mozku kybernetické obrany organizace."
+    },
+    {
+      "id": "slide-2",
+      "title": "Klíčové nástroje SOC: SIEM a SOAR",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "SIEM shromažďuje logy a analyzuje události.",
+          "SOAR automatizuje reakce a orchestraci procesů.",
+          "Kombinace nástrojů výrazně zrychluje vyšetřování incidentů.",
+          "Příklad: Automatické zablokování útočící IP adresy."
+        ]
+      },
+      "teacher_notes": "Představte rozdíl mezi sběrem dat (SIEM) a automatizovanou reakcí (SOAR)."
+    },
+    {
+      "id": "slide-3",
+      "title": "Struktura analytiků SOC: L1, L2 a L3",
+      "type": "network_topology",
+      "content": {
+        "bullet_points": [],
+        "mermaid_diagram": "graph TD\n  A[Detekce alertu SIEM] --> B[L1 Analytik: Triage a filtrace alertů]\n  B -- Eskalace incidentu --> C[L2 Analytik: Hloubkové vyšetřování]\n  C -- Složitý útok / Zranitelnost --> D[L3 Analytik: Threat Hunting a reakce]"
+      },
+      "teacher_notes": "Ukažte třístupňovou strukturu analytiků v SOC centru."
+    },
+    {
+      "id": "slide-4",
+      "title": "Pracovní pozice v SOC: L1 až L3",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "L1 Analytik: První linie, filtrace a eskalace alertů.",
+          "L2 Analytik: Pokročilá analýza a korelace událostí.",
+          "L3 Analytik: Threat hunting, tvorba detekčních pravidel.",
+          "Příklad: L1 předává potvrditelný incident analytikovi L2."
+        ]
+      },
+      "teacher_notes": "Popište náplň práce jednotlivých úrovní SOC analytiků."
+    },
+    {
+      "id": "slide-5",
+      "title": "Specializované technické role",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Incident Responder: Hasič kyberbezpečnosti zastavující probíhající škody.",
+          "Forenzní analytik: Detektiv zkoumající digitální stopy a paměť.",
+          "Penetrační tester: Etický hacker simulující reálné útoky.",
+          "Příklad: Forenzní analýza paměti po napadení malwarem."
+        ]
+      },
+      "teacher_notes": "Zdůrazněte specializované role navázané na řešení a testování bezpečnosti."
+    },
+    {
+      "id": "slide-6",
+      "title": "Řídicí a manažerské pozice",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Manažer KB (CISO): Řízení rizik a strategie bezpečnosti.",
+          "Architekt KB: Návrh bezpečné architektury a systémů.",
+          "Auditor KB: Nezávislá kontrola shody s normami.",
+          "Příklad: CISO určuje bezpečnostní politiku a rozpočet."
+        ]
+      },
+      "teacher_notes": "Vysvětlete rozdíl mezi řízením bezpečnosti (CISO) a nezávislým auditem."
+    },
+    {
+      "id": "slide-7",
+      "title": "Týmy CERT a CSIRT",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Specializované reakční týmy pro řešení bezpečnostních incidentů.",
+          "CSIRT reaguje na hrozby a koordinuje nápravná opatření.",
+          "CERT představuje historické označení a chráněnou značku.",
+          "Příklad: Kontaktní bod pro hlášení kybernetického útoku."
+        ]
+      },
+      "teacher_notes": "Vysvětlete pojem CERT/CSIRT a jejich roli při koordinaci incidentů."
+    },
+    {
+      "id": "slide-8",
+      "title": "Porovnání typů CERT/CSIRT týmů v ČR",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Typ týmu",
+            "Provozovatel / Příklad",
+            "Působnost",
+            "Hlavní role a pravomoci"
+          ],
+          "rows": [
+            [
+              "Interní / Akademický CSIRT",
+              "CESNET (CSIRT-CESNET), banky, firmy",
+              "Konkrétní organizace nebo akademická síť",
+              "Přímý zásah a správa vlastní infrastruktury"
+            ],
+            [
+              "Národní CSIRT",
+              "CZ.NIC (CSIRT.CZ)",
+              "Celá Česká republika (široká veřejnost, ISP)",
+              "Koordinační a osvětové centrum, řešení incidentů"
+            ],
+            [
+              "Vládní CERT",
+              "NÚKIB (GovCERT.CZ)",
+              "Státní správa a kritická informační infrastruktura",
+              "Ochrana kritické infrastruktury státu, legislativa"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": "Vysvětlete roli NÚKIB jako státní autority (GovCERT), CZ.NIC jako správce národní domény (CSIRT.CZ) a CESNETu jako zástupce akademického sektoru."
+    },
+    {
+      "id": "slide-9",
+      "title": "Mezinárodní spolupráce týmů",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Sdílení informací o hrozbách přes protokol TLP.",
+          "Zapojení do mezinárodních síťových struktur FIRST a TF-CSIRT.",
+          "Proaktivní varování před nově objevenými zranitelnostmi.",
+          "Příklad: Rychlá výměna indikátorů kompromitace mezi státy."
+        ]
+      },
+      "teacher_notes": "Ukažte význam mezinárodní výměny informací pro včasnou obranu."
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "blue",
+  "sources": [
+    {
+      "title": "CyberSecurity",
+      "url": "https://knihy.nic.cz/media/filer_public/b5/72/b572d6fb-4276-4f93-a72d-1d2e52443f67/cybersecurity-ukazky.pdf",
+      "locator": "Jan Kolouch, Pavel Bašta a kol., CZ.NIC, 2019",
+      "kind": "pdf"
+    },
+    {
+      "title": "CSIRT vs. CERT: Similarities, Differences, and 8 Examples of CERTs",
+      "url": "https://www.exabeam.com/explainers/information-security/csirt-vs-cert-similarities-differences-and-8-examples-of-certs/",
+      "locator": "Exabeam Security Explainers",
+      "kind": "web"
+    },
+    {
+      "title": "ZPRÁVA O ČINNOSTI CSIRT.CZ ZA ROK 2025",
+      "locator": "CSIRT.CZ / CZ.NIC, 2025",
+      "kind": "pdf"
+    },
+    {
+      "title": "Nástroje pro váš SOC tým: SIEM a SOAR",
+      "url": "https://digitalsecurityguide.eset.com/cz/nastroje-pro-vas-soc-tym-siem-a-soar",
+      "locator": "ESET Digital Security Guide, 2024",
+      "kind": "web"
+    },
+    {
+      "title": "Certified SOC Analyst | CSA",
+      "url": "https://www.tx.cz/hacking/certified-soc-analyst",
+      "locator": "TAYLLORCOX Akademie",
+      "kind": "web"
+    }
+  ]
+}
