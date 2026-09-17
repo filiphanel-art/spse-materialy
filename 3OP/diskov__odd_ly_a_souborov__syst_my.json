@@ -1,0 +1,252 @@
+{
+  "title": "Diskové oddíly a souborové systémy",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Účel diskových oddílů",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Rozdělení fyzického disku na logické části.",
+          "Oddělení operačního systému a uživatelských dat.",
+          "Umožňuje instalaci více OS současně."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-2",
+      "title": "Schéma MBR (Master Boot Record)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Tradiční standard diskových oddílů od roku 1983.",
+          "Uložen v prvním sektoru disku (512 B).",
+          "Omezení na maximálně 4 primární oddíly.",
+          "Kapacitní limit disku do 2 TB."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Schéma GPT (GUID Partition Table)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Moderní standard spojený s rozhraním UEFI.",
+          "Podpora až 128 primárních oddílů.",
+          "Kapacitní limit disku až 9,4 ZB.",
+          "Záložní hlavička na konci disku pro obnovu."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-4",
+      "title": "Srovnání MBR vs. GPT",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Vlastnost",
+            "MBR (Legacy)",
+            "GPT (UEFI)"
+          ],
+          "rows": [
+            [
+              "Max. velikost disku",
+              "2 TB (2 TiB)",
+              "Až 9,4 ZB"
+            ],
+            [
+              "Max. počet oddílů",
+              "4 primární (nebo 3+1 rozšířený)",
+              "Až 128 primárních"
+            ],
+            [
+              "Firmware",
+              "BIOS / Legacy",
+              "UEFI"
+            ],
+            [
+              "Spolehlivost",
+              "Jediný boot sektor (riziko poškození)",
+              "Záložní tabulka + CRC32 kontrola"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-1789619879111",
+      "title": "Standardní oddíly Windows (UEFI / GPT)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "EFI System Partition (ESP): Obsahuje zaváděcí soubory UEFI a bootloader pro spuštění systému (formát FAT32, velký obvykle 100 až 500 MB).",
+          "Microsoft Reserved Partition (MSR): Vyhrazený oddíl bez souborového systému určený pro správu disku a strukturu GPT (velikost obvykle 16 MB).",
+          "Systémový oddíl (C:): Hlavní datový oddíl obsahující operační systém Windows, nainstalované aplikace a uživatelské profily (formát NTFS).",
+          "Záchranný oddíl (Recovery Partition): Obsahuje prostředí pro obnovu systému (WinRE) a diagnostické nástroje při selhání startu (formát NTFS, velikost jednotky GB)."
+        ]
+      },
+      "teacher_notes": "Zdůrazněte studentům, že oddíly EFI, MSR a Recovery jsou ve výchozím stavu v Průzkumníku souborů skryté, ale jsou vidět ve Správě disků nebo nástroji diskpart."
+    },
+    {
+      "id": "slide-5",
+      "title": "Co je souborový systém (Filesystem)",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Struktura pro organizaci a ukládání dat.",
+          "Řídí čtení, zápis a přístupová práva.",
+          "Definuje metadata a adresářovou strukturu.",
+          "Zřizuje se formátováním diskového oddílu."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-6",
+      "title": "Souborové systémy pro Windows",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "NTFS: Hlavní systém Windows s žurnálováním.",
+          "NTFS nabízí šifrování, kvóty a práva.",
+          "FAT32: Starší formát s vysokou kompatibilitou.",
+          "exFAT: Univerzální systém pro přenosné disky."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-7",
+      "title": "Souborové systémy pro Linux a macOS",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "ext4: Výchozí souborový systém pro Linux.",
+          "ext4 využívá extenty pro snížení fragmentace.",
+          "APFS: Moderní systém Apple pro SSD úložiště.",
+          "APFS podporuje snímky disku a sdílení místa."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-8",
+      "title": "Srovnání souborových systémů",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Souborový systém",
+            "Hlavní OS",
+            "Klíčové vlastnosti",
+            "Kompatibilita"
+          ],
+          "rows": [
+            [
+              "NTFS",
+              "Windows",
+              "Žurnálování, přístupová práva, šifrování",
+              "Omezený zápis na macOS/Linux"
+            ],
+            [
+              "ext4",
+              "Linux",
+              "Extenty, vysoký výkon, žurnálování",
+              "Nativně pouze Linux"
+            ],
+            [
+              "APFS",
+              "macOS",
+              "Optimalizace pro SSD, snímky, šifrování",
+              "Nativně pouze Apple ekosystém"
+            ],
+            [
+              "exFAT",
+              "Univerzální",
+              "Bez pokročilých práv, široká podpora",
+              "Windows, macOS i Linux"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-1789651486961",
+      "title": "Nástroje pro správu diskových oddílů",
+      "type": "blocks",
+      "content": {
+        "blocks_style": "grid",
+        "blocks": [
+          {
+            "title": "diskpart",
+            "text": "Konzolový (CLI) nástroj integrovaný ve Windows. Nabízí plnou kontrolu nad disky, oddíly a svazky. Vhodný pro skriptování a pokročilé operace.",
+            "icon": ""
+          },
+          {
+            "title": "Správa disků (GUI)",
+            "text": "Vestavěný grafický nástroj ve Windows (diskmgmt.msc). Umožňuje přehledně vytvářet, formátovat, měnit písmena jednotek či měnit velikosti oddílů.",
+            "icon": ""
+          },
+          {
+            "title": "GParted",
+            "text": "Populární open-source nástroj pro Linux (často spouštěný z Live USB). Podporuje širokou škálu souborových systémů (ext4, NTFS, FAT32, exFAT, btrfs).",
+            "icon": ""
+          },
+          {
+            "title": "AOMEI / Paragon / EaseUS",
+            "text": "Pokročilé komerční grafické aplikace. Nabízejí nadstandardní funkce jako klonování disků, změnu velikosti bez ztráty dat či převod MBR na GPT.",
+            "icon": ""
+          }
+        ]
+      },
+      "teacher_notes": "Zdůrazněte studentům, že práce s příkazovým řádkem v nástroji diskpart vyžaduje zvýšenou opatrnost, protože chybně zvolené číslo disku nebo oddílu může vedst k okamžité ztrátě dat. Pro záchranu či úpravu oddílů mimo běh OS se často používá bootovací USB s GParted."
+    }
+  ],
+  "template": "op2",
+  "show_bullet_markers": true,
+  "op2_color_scheme": "white",
+  "sources": [
+    {
+      "title": "GPT versus MBR: srovnání formátů pro diskové oddíly - 1.díl - Computertrends",
+      "url": "https://www.computertrends.cz/clanky/gpt-versus-mbr-srovnani-formatu-pro-diskove-oddily-1-dil/"
+    },
+    {
+      "title": "MBR VS GPT | Jaký je rozdíl a co je lepší - EaseUS",
+      "url": "https://www.easeus.cz/manage-partitions/mbr-vs-gpt.html"
+    },
+    {
+      "title": "MBR nebo GPT: Jaký typ tabulky oddílů zvolit a proč? - MyDreams Hosting",
+      "url": "https://www.mydreams.cz/cz/wiki.html"
+    },
+    {
+      "title": "File Systems Compared: NTFS, ext4, APFS and More - Patsnap Eureka",
+      "url": "https://eureka.patsnap.com/blog"
+    },
+    {
+      "title": "Schémata oddílů dostupná v Diskové utilitě na Macu - Apple Support",
+      "url": "https://support.apple.com/cs-cz/guide/disk-utility/dsku1c614201/mac"
+    },
+    {
+      "title": "Tip: Jak v záplavě externích disků vybrat ten správný - 2.díl - Computertrends",
+      "url": "https://www.computertrends.cz/clanky/tip-jak-v-zaplave-externich-disku-vybrat-ten-spravny-2-dil/"
+    },
+    {
+      "title": "BIOS/UEFI and the Boot Process - Grasp",
+      "url": "https://paths.grasp.study/modules/e5f8cf5b-069e-4c08-9b12-4a56cb139c40/lessons/61b4443c-857e-457f-80a6-dcc4660c16e3"
+    },
+    {
+      "title": "UEFI ADVANTAGES OVER LEGACY MODE"
+    }
+  ]
+}
