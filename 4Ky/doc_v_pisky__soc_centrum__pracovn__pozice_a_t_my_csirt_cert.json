@@ -1,0 +1,156 @@
+{
+  "id": "doc-1789641006187-5",
+  "title": "Výpisky: SOC centrum, pracovní pozice a týmy CSIRT/CERT",
+  "subtitle": "Výuková skripta a výpisky k přednášce — Operační systémy a počítačové sítě",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "school": "Střední průmyslová škola elektrotechnická (SPŠE)",
+  "date": "2026",
+  "tags": [
+    "Operační systémy a počítačové sítě",
+    "Výpisky",
+    "SPŠE",
+    "Maturita"
+  ],
+  "summary": "Ucelený souhrnný studijní materiál k tématu SOC centrum, pracovní pozice v kybernetické bezpečnosti a týmy CSIRT/CERT pro střední průmyslové školy elektrotechnické.",
+  "learning_objectives": [
+    "Zvládnout teoretické koncepty tématu SOC centrum, pracovní pozice v kybernetické bezpečnosti a týmy CSIRT/CERT.",
+    "Aplikovat praktické ukázky kódu a diagnostiky.",
+    "Připravit se na kontrolní test a maturitní otázky."
+  ],
+  "sections": [
+    {
+      "id": "sec-1",
+      "title": "Bezpečnostní dohledové centrum (SOC) a jeho nástroje",
+      "level": 1,
+      "content": "**Definice:** Bezpečnostní dohledové centrum (Security Operations Center – SOC) je centralizované pracoviště odpovědné za nepřetržité monitorování, detekci, analýzu a reakci na kybernetické bezpečnostní hrozby a incidenty.\n\n**Vysvětlení:** Fungování SOC centra stojí na propojení kvalifikovaných odborníků, zavedených procesů a pokročilých technologií. Mezi základní softwarové nástroje patří SIEM (Security Information and Event Management), který shromažďuje a koreluje bezpečnostní logy ze všech prvků sítě, a SOAR (Security Orchestration, Automation, and Response), jenž umožňuje automatizovat reaktivní kroky a zrychlit zpracování velkého objemu výstrah.\n\n**Příklad:** Pokud SIEM detekuje 500 neúspěšných pokusů o přihlášení během jedné minuty z neznámé IP adresy, vyhodnotí to jako incident a SOAR automaticky dočasně zablokuje příchozí provoz z této adresy.",
+      "bullet_points": [],
+      "callout": {
+        "type": "info",
+        "title": "Rozdíl mezi SIEM a SOAR",
+        "content": "Zatímco SIEM slouží především k pasivnímu sběru, korelaci a detekci incidentů (vidí, co se děje), SOAR navazuje aktivní automatizovanou reakcí (vykoná předdefinované kroky k nápravě bez nutnosti zásahu člověka)."
+      }
+    },
+    {
+      "id": "sec-2",
+      "title": "Hierarchie a pracovní pozice SOC analytiků (L1, L2, L3)",
+      "level": 1,
+      "content": "**Definice:** Operativní tým SOC bývá v organizacích rozdělen do tří základních úrovní (Tiers / Levels) podle zkušeností a náplně práce.\n\n**Vysvětlení:**\n- **L1 Analytik (Tier 1):** První linie dohledu. Vyhodnocuje přicházející výstrahy ze SIEMu podle připravených scénářů (playbooks), filtruje falešná poplašná hlášení (false positives) a potvrzené incidenty eskaluje vyšší úrovni.\n- **L2 Analytik (Tier 2):** Provádí hloubkovou analýzu eskalovaných incidentů, zjišťuje rozsah kompromitace, rekonstruuje průběh útoku a navrhuje nápravná opatření.\n- **L3 Analytik (Tier 3):** Seniorní expert, který se zaměřuje na proaktivní vyhledávání dosud neodhalených hrozeb (Threat Hunting), vývoj nových detekčních pravidel a řešení nejnáročnějších bezpečnostních incidentů.\n\n**Příklad:** L1 analytik zachytí podezřelé spuštění skriptu na stanici a vytvoří tiket; L2 analytik zanalyzuje síťovou komunikaci a zjistí typ malwaru; L3 analytik na základě nálezu vytvoří nové pravidlo v SIEM pro celou síť.",
+      "bullet_points": [],
+      "callout": {
+        "type": "tip",
+        "title": "Vstupní pozice v oboru",
+        "content": "Pozice L1 analytika je nejčastějším startovacím bodem pro kariéru v kybernetické bezpečnosti. Klíčovou dovedností je schopnost efektivně pracovat s metodickými návody (playbooks) a rychle rozpoznat falešné poplachy."
+      }
+    },
+    {
+      "id": "sec-3",
+      "title": "Specializované technické a bezpečnostní pozice",
+      "level": 1,
+      "content": "**Definice:** Vedle dohledového centra působí v kybernetické bezpečnosti specializované odborné role zaměřené na reakci, vyšetřování a testování.\n\n**Vysvětlení:**\n- **Incident Responder (Hasič):** Specialist na přímou a rychlou reakci při probíhajícím kybernetickém útoku. Jeho cílem je zastavit šíření škod a obnovit provoz.\n- **Forenzní analytik (Detektiv):** Odborník na digitální forenzní analýzu (DFIR). Zkoumá operační paměť, diskové obrazy a logy napadených zařízení za účelem zajištění důkazů a identifikace útočníka.\n- **Threat Hunter (Lovce):** Proaktivně vyhledává stopy útočníků v síti dříve, než spustí alarm.\n- **Penetrační tester / Red Teamer (Etický hacker):** Legálně simuluje kybernetické útoky na systémy organizace s cílem odhalit zranitelnosti dříve, než je zneužijí reální útočníci.\n\n**Příklad:** Po napadení serveru ransomwarem převezme řízení Incident Responder k izolaci sítě, zatímco Forenzní analytik zkoumá paměťový otisk serveru k odhalení vstupního bodu útoku.",
+      "bullet_points": []
+    },
+    {
+      "id": "sec-4",
+      "title": "Řídicí, manažerské a architektonické role",
+      "level": 1,
+      "content": "**Definice:** Řídicí role definují strategii bezpečnosti, architekturu systémů a nezávislý dohled nad dodržováním předpisů.\n\n**Vysvětlení:**\n- **Manažer kybernetické bezpečnosti (CISO / MKB):** Exekutivní manažer odpovědný za řízení rizik, bezpečnostní politiky, rozpočet a soulad s legislativou.\n- **Architekt kybernetické bezpečnosti:** Navrhuje bezpečnou strukturu ICT sítí, segmentaci (VLAN, DMZ) a pravidla integrace nových technologií.\n- **Auditor kybernetické bezpečnosti:** Provádí nezávislé prověrky a audity, zda zavedená opatření odpovídají normám (např. ISO 27001 nebo zákonu o kybernetické bezpečnosti).\n\n**Příklad:** Manažer KB (CISO) určí potřebu ochrany zákaznických dat, Architekt navrhne šifrovanou databázi v oddělené síťové zóně a Auditor následně ověří, zda je šifrování správně nasazeno.",
+      "bullet_points": [],
+      "callout": {
+        "type": "warning",
+        "title": "Pozor na střet zájmů u auditu",
+        "content": "Auditor kybernetické bezpečnosti musí být vždy nezávislý. V praxi by stejná osoba nebo tým nikdy neměl bezpečnostní architekturu zároveň navrhovat/implementovat a následně auditovat."
+      }
+    },
+    {
+      "id": "sec-5",
+      "title": "Reakční týmy CERT a CSIRT",
+      "level": 1,
+      "content": "**Definice:** Týmy CERT (Computer Emergency Response Team) a CSIRT (Computer Security Incident Response Team) jsou specializované pracoviště odpovědná za řešení, koordinaci a prevenci bezpečnostních incidentů v vymezené oblasti působnosti.\n\n**Vysvětlení:** Označení CERT a CSIRT se v praxi používají jako synonyma. Zkratka CERT je chráněnou známkou Carnegie Mellon University, zatímco CSIRT je obecným odborným termínem. Týmy slouží jako kontaktní záchytný bod, na který se mohou správci sítí i uživatelé obrátit při zjištění útoku. Základní povinností týmu je reakce na incidenty, analýza škodlivého kódu a sdílení varování.\n\n**Příklad:** Při masivním šíření phishingové kampaně vydá tým CSIRT bezpečnostní varování s indikátory kompromitace (IoC) pro všechny správce ve své působnosti.",
+      "bullet_points": []
+    },
+    {
+      "id": "sec-6",
+      "title": "Národní bezpečnostní struktura v ČR a mezinárodní spolupráce",
+      "level": 1,
+      "content": "**Definice:** V České republice je bezpečnostní struktura rozdělena mezi národní tým, vládní tým a mezinárodní komunitní sítě.\n\n**Vysvětlení:**\n- **Národní CSIRT (CSIRT.CZ):** Provozovaný sdružením CZ.NIC. Slouží jako koordinační centrum a záchytný bod pro běžné sítě, ISP, banky a veřejnost v ČR.\n- **Vládní CERT (GovCERT.CZ):** Provozovaný Národním úřadem pro kybernetickou a informační bezpečnost (NÚKIB). Řeší incidenty v orgánech státní správy a v prvcích kritické informační infrastruktury (KII).\n- **Mezinárodní sítě (FIRST, TF-CSIRT):** Globální a evropská fóra umožňující rychlou výměnu informací o hrozbách mezi týmy z celého světa s využitím protokolu TLP (Traffic Light Protocol).\n\n**Příklad:** Při útoku na bankovní sektor koordinuje nápravu CSIRT.CZ; při útoku na ministerstvo nebo energetickou síť zasahuje GovCERT.CZ pod NÚKIB.",
+      "bullet_points": [],
+      "callout": {
+        "type": "warning",
+        "title": "Častá chyba: Záměna CSIRT.CZ a GovCERT.CZ",
+        "content": "Nezaměňujte tyto dva týmy: CSIRT.CZ (provozovaný CZ.NIC) koordinuje incidenty pro veřejnost, ISP a firmy. GovCERT.CZ (pod hlavičkou NÚKIB) chrání výhradně orgány státní správy a prvky kritické infrastruktury."
+      },
+      "table": {
+        "headers": [
+          "Typ týmu",
+          "Působnost",
+          "Hlavní role a pravomoci"
+        ],
+        "rows": [
+          [
+            "Interní CSIRT",
+            "Konkrétní organizace / firma",
+            "Přímý zásah a správa vlastní sítě"
+          ],
+          [
+            "Národní CSIRT (CSIRT.CZ)",
+            "Celá Česká republika",
+            "Koordinační centrum a záchytný bod"
+          ],
+          [
+            "Vládní CERT (GovCERT.CZ)",
+            "Státní správa a KII",
+            "Ochrana kritické infrastruktury státu"
+          ]
+        ]
+      }
+    }
+  ],
+  "review_questions": [
+    {
+      "id": "q-auto-1",
+      "question": "Vysvětlete hlavní cíl a princip tématu SOC centrum, pracovní pozice v kybernetické bezpečnosti a týmy CSIRT/CERT.",
+      "answer": "Téma SOC centrum, pracovní pozice v kybernetické bezpečnosti a týmy CSIRT/CERT rozebírá klíčové koncepty v rámci předmětu Operační systémy a počítačové sítě.",
+      "difficulty": "medium",
+      "category": "teorie"
+    },
+    {
+      "id": "q-auto-2",
+      "question": "Jaké jsou praktické kroky a postupy ověření prezentované v této lekci?",
+      "answer": "Postupy zahrnují práci v terminálu, systémová volání a ověření konfigurace podle technických standardů.",
+      "difficulty": "easy",
+      "category": "konfigurace"
+    }
+  ],
+  "sources": [
+    {
+      "title": "CyberSecurity",
+      "url": "https://knihy.nic.cz/media/filer_public/b5/72/b572d6fb-4276-4f93-a72d-1d2e52443f67/cybersecurity-ukazky.pdf",
+      "locator": "Jan Kolouch, Pavel Bašta a kol., CZ.NIC, 2019",
+      "kind": "pdf"
+    },
+    {
+      "title": "CSIRT vs. CERT: Similarities, Differences, and 8 Examples of CERTs",
+      "url": "https://www.exabeam.com/explainers/information-security/csirt-vs-cert-similarities-differences-and-8-examples-of-certs/",
+      "locator": "Exabeam Security Explainers",
+      "kind": "web"
+    },
+    {
+      "title": "ZPRÁVA O ČINNOSTI CSIRT.CZ ZA ROK 2025",
+      "locator": "CSIRT.CZ / CZ.NIC, 2025",
+      "kind": "pdf"
+    },
+    {
+      "title": "Nástroje pro váš SOC tým: SIEM a SOAR",
+      "url": "https://digitalsecurityguide.eset.com/cz/nastroje-pro-vas-soc-tym-siem-a-soar",
+      "locator": "ESET Digital Security Guide, 2024",
+      "kind": "web"
+    },
+    {
+      "title": "Certified SOC Analyst | CSA",
+      "url": "https://www.tx.cz/hacking/certified-soc-analyst",
+      "locator": "TAYLLORCOX Akademie",
+      "kind": "web"
+    }
+  ]
+}
