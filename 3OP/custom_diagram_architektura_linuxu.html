@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="cs" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktivní Architektura Linuxu (Blokové Schéma)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .onion-sector {
+            transition: all 0.25s ease-in-out;
+            cursor: pointer;
+        }
+        .onion-sector:hover {
+            filter: brightness(1.25);
+            stroke: #38bdf8;
+            stroke-width: 3;
+        }
+        .onion-sector.active {
+            filter: brightness(1.35);
+            stroke: #f59e0b;
+            stroke-width: 3.5;
+        }
+        .component-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .component-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="h-full font-sans antialiased flex flex-col custom-scrollbar overflow-x-hidden">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/20 font-black">
+                    <i class="fa-brands fa-linux text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Architektura Linuxu
+                        <span class="text-xs font-mono font-normal px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/50">Prvky A – F / 1 – 9</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Interaktivní blokové schéma: HW, Jádro, Ochranná vrstva, Uživatelský prostor a Grafická nadstavba</p>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="flex items-center flex-wrap gap-2 w-full md:w-auto">
+                <!-- Search Input -->
+                <div class="relative flex-1 md:w-56">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Hledat (např. libc, Scheduler, Xserver)..." 
+                        class="w-full pl-9 pr-3 py-1.5 bg-slate-950 border border-slate-700/80 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors">
+                </div>
+
+                <!-- View Switcher -->
+                <div class="flex bg-slate-950 p-1 rounded-lg border border-slate-800">
+                    <button id="btnStackView" onclick="switchView('stack')" class="px-3 py-1 text-xs font-medium rounded-md bg-emerald-600 text-white transition-all">
+                        <i class="fa-solid fa-layer-group mr-1"></i> Blokové
+                    </button>
+                    <button id="btnOnionView" onclick="switchView('onion')" class="px-3 py-1 text-xs font-medium rounded-md text-slate-400 hover:text-white transition-all">
+                        <i class="fa-solid fa-circle-notch mr-1"></i> Cibulové
+                    </button>
+                </div>
+                
+                <!-- Action Buttons -->
+                <button onclick="startSyscallDemo()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 shadow-md shadow-amber-600/20">
+                    <i class="fa-solid fa-play text-xs"></i>
+                    <span>Simulace</span>
+                </button>
+
+                <button onclick="resetDiagram()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Side: Interactive Diagrams (8 Cols) -->
+        <section class="lg:col-span-8 flex flex-col gap-4">
+            
+            <!-- System Call Animation Alert Banner -->
+            <div id="demoBanner" class="hidden bg-emerald-950/80 border border-emerald-500/50 rounded-xl p-3 text-sm text-emerald-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                    </span>
+                    <span id="demoStepText">Probíhá simulace toku systémového volání napříč vrstvami A–F...</span>
+                </div>
+                <button onclick="stopSyscallDemo()" class="text-xs text-emerald-400 hover:text-white underline">Zrušit</button>
+            </div>
+
+            <!-- Architectural Legend Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs text-slate-400">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <span class="font-semibold text-slate-300">Vrstva:</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-600"></span> A: HW</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-600"></span> B: Kernel (1-5)</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-rose-500"></span> C: Ochrana</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-sky-500"></span> D+: User Space (6-9)</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-indigo-500"></span> E+: Xserver</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-purple-500"></span> F+: GUI</span>
+                </div>
+                <div class="text-slate-500 hidden sm:block">
+                    <i class="fa-solid fa-mouse-pointer mr-1"></i> Klikněte na jakýkoliv blok
+                </div>
+            </div>
+
+            <!-- 1. STACKED BLOCK VIEW CONTAINER (Default Active) -->
+            <div id="stackContainer" class="bg-slate-950 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col gap-4">
+                <h2 class="text-xs font-mono uppercase tracking-widest text-slate-400">Vrstvené Blokové Schéma (A–F)</h2>
+
+                <!-- F+: GUI Packages -->
+                <div onclick="selectComponent('F')" id="comp-F" class="component-card cursor-pointer p-3.5 bg-purple-950/60 border-2 border-purple-500 rounded-xl text-center hover:bg-purple-900/60">
+                    <div class="font-bold text-sm text-purple-300">F+ : Grafická nadstavba - GUI balíky</div>
+                    <div class="text-xs text-purple-200 opacity-80 mt-0.5">GNOME, KDE Plasma, GTK, Qt, Firefox, LibreOffice</div>
+                </div>
+
+                <!-- Vertical Flow Arrows -->
+                <div class="text-center text-purple-400 text-xs -my-2 z-10">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                </div>
+
+                <!-- E+: Xserver -->
+                <div onclick="selectComponent('E')" id="comp-E" class="component-card cursor-pointer p-3.5 bg-indigo-950/60 border-2 border-indigo-500 rounded-xl text-center hover:bg-indigo-900/60">
+                    <div class="font-bold text-sm text-indigo-300">E+ : Grafická nadstavba - Xserver</div>
+                    <div class="text-xs text-indigo-200 opacity-80 mt-0.5">X.Org Server (X11) / Wayland Compositor, DRI/DRM rozhraní</div>
+                </div>
+
+                <!-- Vertical Flow Arrows -->
+                <div class="text-center text-sky-400 text-xs -my-2 z-10">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                </div>
+
+                <!-- D+: User Space -->
+                <div class="border-2 border-sky-400/80 bg-sky-950/30 p-4 rounded-xl space-y-3">
+                    <div class="font-bold text-xs text-sky-300 flex justify-between items-center">
+                        <span>D+ : User space - Uživatelský prostor (Ring 3)</span>
+                        <span class="text-[10px] font-mono font-normal bg-sky-950 px-2 py-0.5 rounded border border-sky-700">Uživatelský mód</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div onclick="selectComponent('6')" id="comp-6" class="component-card cursor-pointer p-3 bg-slate-900 border border-sky-500 text-center rounded-lg text-xs text-sky-200 font-semibold hover:bg-slate-800">
+                            <i class="fa-solid fa-terminal block text-sky-400 mb-1 text-sm"></i>
+                            6 : Shell
+                        </div>
+                        <div onclick="selectComponent('7')" id="comp-7" class="component-card cursor-pointer p-3 bg-slate-900 border border-sky-500 text-center rounded-lg text-xs text-sky-200 font-semibold hover:bg-slate-800">
+                            <i class="fa-solid fa-wrench block text-sky-400 mb-1 text-sm"></i>
+                            7 : Utility
+                        </div>
+                        <div onclick="selectComponent('8')" id="comp-8" class="component-card cursor-pointer p-3 bg-slate-900 border border-sky-500 text-center rounded-lg text-xs text-sky-200 font-semibold hover:bg-slate-800">
+                            <i class="fa-solid fa-cube block text-sky-400 mb-1 text-sm"></i>
+                            8D : LIB (libc)
+                        </div>
+                        <div onclick="selectComponent('9')" id="comp-9" class="component-card cursor-pointer p-3 bg-slate-900 border border-sky-500 text-center rounded-lg text-xs text-sky-200 font-semibold hover:bg-slate-800">
+                            <i class="fa-solid fa-gears block text-sky-400 mb-1 text-sm"></i>
+                            9 : Sys apps
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vertical Flow Arrows -->
+                <div class="text-center text-rose-400 text-xs -my-2 z-10">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                </div>
+
+                <!-- C: Vrstva ochrany -->
+                <div onclick="selectComponent('C')" id="comp-C" class="component-card cursor-pointer p-3 bg-rose-950/80 border-2 border-rose-500 text-rose-200 font-bold text-center rounded-xl hover:bg-rose-900/80">
+                    <div class="text-sm">C : Vrstva ochrany systému před nestabilitou</div>
+                    <div class="text-xs font-mono font-normal opacity-90 mt-0.5">System Call Interface (SYSCALL) • Přepínání Ring 3 ↔ Ring 0</div>
+                </div>
+
+                <!-- Vertical Flow Arrows -->
+                <div class="text-center text-emerald-400 text-xs -my-2 z-10">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                </div>
+
+                <!-- B: Kernel -->
+                <div class="border-2 border-emerald-500/80 bg-emerald-950/30 p-4 rounded-xl space-y-3">
+                    <div class="font-bold text-xs text-emerald-300 flex justify-between items-center">
+                        <span>B : Kernel - celá slupka (Ring 0)</span>
+                        <span class="text-[10px] font-mono font-normal bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700">Privilegovaný mód</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                        <div onclick="selectComponent('1')" id="comp-1" class="component-card cursor-pointer p-2.5 bg-slate-900 border border-emerald-600 text-center rounded-lg text-xs text-emerald-300 font-bold hover:bg-slate-800">
+                            <i class="fa-solid fa-diagram-project block text-emerald-400 mb-1 text-xs"></i>
+                            1 : Scheduler
+                        </div>
+                        <div onclick="selectComponent('2')" id="comp-2" class="component-card cursor-pointer p-2.5 bg-slate-900 border border-emerald-600 text-center rounded-lg text-xs text-emerald-300 font-bold hover:bg-slate-800">
+                            <i class="fa-solid fa-hard-drive block text-emerald-400 mb-1 text-xs"></i>
+                            2 : Drivers
+                        </div>
+                        <div onclick="selectComponent('3')" id="comp-3" class="component-card cursor-pointer p-2.5 bg-slate-900 border border-emerald-600 text-center rounded-lg text-xs text-emerald-300 font-bold hover:bg-slate-800">
+                            <i class="fa-solid fa-folder-tree block text-emerald-400 mb-1 text-xs"></i>
+                            3B : Filesystem
+                        </div>
+                        <div onclick="selectComponent('4')" id="comp-4" class="component-card cursor-pointer p-2.5 bg-slate-900 border border-emerald-600 text-center rounded-lg text-xs text-emerald-300 font-bold hover:bg-slate-800">
+                            <i class="fa-solid fa-code block text-emerald-400 mb-1 text-xs"></i>
+                            4 : LIB (Kernel)
+                        </div>
+                        <div onclick="selectComponent('5')" id="comp-5" class="component-card cursor-pointer p-2.5 bg-slate-900 border border-emerald-600 text-center rounded-lg text-xs text-emerald-300 font-bold hover:bg-slate-800">
+                            <i class="fa-solid fa-memory block text-emerald-400 mb-1 text-xs"></i>
+                            5 : Virt. memory
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vertical Flow Arrows -->
+                <div class="text-center text-amber-500 text-xs -my-2 z-10">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                </div>
+
+                <!-- A: HW -->
+                <div onclick="selectComponent('A')" id="comp-A" class="component-card cursor-pointer p-3.5 bg-amber-900/90 border-2 border-amber-500 text-amber-100 font-bold text-center rounded-xl hover:bg-amber-800 shadow-lg">
+                    <div class="text-sm">A : HW (Hardware - Fyzická vrstva)</div>
+                    <div class="text-xs font-normal opacity-90 mt-0.5">CPU, RAM, MMU, Disky (NVMe/SSD), Sběrnice, GPU, Řadiče</div>
+                </div>
+            </div>
+
+            <!-- 2. CONCENTRIC ONION DIAGRAM CONTAINER (Hidden by default, toggleable) -->
+            <div id="onionContainer" class="hidden bg-slate-950 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xl relative overflow-hidden flex-col items-center justify-center min-h-[520px]">
+                <h2 class="text-xs font-mono uppercase tracking-widest text-slate-400 mb-2">Kruhové / Cibulové Schéma Linuxu</h2>
+                
+                <svg viewBox="-320 -320 640 640" class="w-full max-w-[500px] h-auto drop-shadow-xl select-none" id="onionSvg">
+                    <!-- Ring F: GUI Packages -->
+                    <circle cx="0" cy="0" r="300" fill="rgba(168, 85, 247, 0.08)" stroke="#a855f7" stroke-width="2" stroke-dasharray="6,4"/>
+                    <path class="onion-sector" id="sec-F" onclick="selectComponent('F')" d="M 0,-300 A 300 300 0 1 1 -0.01,-300 L -0.01,-250 A 250 250 0 1 0 0,-250 Z" fill="rgba(168, 85, 247, 0.25)" stroke="#a855f7" stroke-width="1.5"/>
+                    <text x="0" y="-270" text-anchor="middle" fill="#e9d5ff" font-size="14" font-weight="bold">F+ : Grafická nadstavba - GUI balíky</text>
+
+                    <!-- Ring E: Xserver -->
+                    <circle cx="0" cy="0" r="250" fill="rgba(99, 102, 241, 0.08)" stroke="#6366f1" stroke-width="2"/>
+                    <path class="onion-sector" id="sec-E" onclick="selectComponent('E')" d="M 0,-250 A 250 250 0 1 1 -0.01,-250 L -0.01,-200 A 200 200 0 1 0 0,-200 Z" fill="rgba(99, 102, 241, 0.25)" stroke="#6366f1" stroke-width="1.5"/>
+                    <text x="0" y="-220" text-anchor="middle" fill="#c7d2fe" font-size="14" font-weight="bold">E+ : Grafická nadstavba - Xserver</text>
+
+                    <!-- Ring D+: User space (6, 7, 8, 9) -->
+                    <circle cx="0" cy="0" r="200" fill="rgba(14, 165, 233, 0.06)" stroke="#0284c7" stroke-width="2"/>
+                    <!-- Sector 8D: LIB libc -->
+                    <path class="onion-sector" id="sec-8" onclick="selectComponent('8')" d="M 0,-200 A 200 200 0 0 1 200,0 L 145,0 A 145 145 0 0 0 0,-145 Z" fill="rgba(14, 165, 233, 0.3)" stroke="#38bdf8" stroke-width="1.5"/>
+                    <text x="90" y="-80" text-anchor="middle" fill="#bae6fd" font-size="13" font-weight="bold">8D: LIB libc</text>
+
+                    <!-- Sector 9: Sys apps -->
+                    <path class="onion-sector" id="sec-9" onclick="selectComponent('9')" d="M 200,0 A 200 200 0 0 1 0,200 L 0,145 A 145 145 0 0 0 145,0 Z" fill="rgba(14, 165, 233, 0.22)" stroke="#38bdf8" stroke-width="1.5"/>
+                    <text x="90" y="100" text-anchor="middle" fill="#bae6fd" font-size="13" font-weight="bold">9: Sys apps</text>
+
+                    <!-- Sector 6: Shell -->
+                    <path class="onion-sector" id="sec-6" onclick="selectComponent('6')" d="M 0,200 A 200 200 0 0 1 -200,0 L -145,0 A 145 145 0 0 0 0,145 Z" fill="rgba(14, 165, 233, 0.3)" stroke="#38bdf8" stroke-width="1.5"/>
+                    <text x="-90" y="100" text-anchor="middle" fill="#bae6fd" font-size="13" font-weight="bold">6: Shell</text>
+
+                    <!-- Sector 7: Utility -->
+                    <path class="onion-sector" id="sec-7" onclick="selectComponent('7')" d="M -200,0 A 200 200 0 0 1 0,-200 L 0,-145 A 145 145 0 0 0 -145,0 Z" fill="rgba(14, 165, 233, 0.22)" stroke="#38bdf8" stroke-width="1.5"/>
+                    <text x="-90" y="-80" text-anchor="middle" fill="#bae6fd" font-size="13" font-weight="bold">7: Utility</text>
+
+                    <!-- Ring C: Vrstva ochrany -->
+                    <circle cx="0" cy="0" r="145" fill="none" stroke="#f43f5e" stroke-width="3"/>
+                    <path class="onion-sector" id="sec-C" onclick="selectComponent('C')" d="M 0,-145 A 145 145 0 1 1 -0.01,-145 L -0.01,-130 A 130 130 0 1 0 0,-130 Z" fill="rgba(244, 63, 94, 0.45)" stroke="#fb7185" stroke-width="1"/>
+                    <text x="0" y="-134" text-anchor="middle" fill="#fecdd3" font-size="9" font-weight="bold">C: VRSTVA OCHRANY SYSTÉMU (SYSCALL / RING 0/3)</text>
+
+                    <!-- Ring B: Kernel (1, 2, 3, 4, 5) -->
+                    <!-- Sector 3B: FS -->
+                    <path class="onion-sector" id="sec-3" onclick="selectComponent('3')" d="M -38,-124 A 130 130 0 0 1 38,-124 L 17,-57 A 60 60 0 0 0 -17,-57 Z" fill="rgba(16, 185, 129, 0.35)" stroke="#34d399" stroke-width="1.5"/>
+                    <text x="0" y="-85" text-anchor="middle" fill="#a7f3d0" font-size="12" font-weight="bold">3B: FS</text>
+
+                    <!-- Sector 4: LIB Kernel -->
+                    <path class="onion-sector" id="sec-4" onclick="selectComponent('4')" d="M 38,-124 A 130 130 0 0 1 124,-38 L 57,-17 A 60 60 0 0 0 17,-57 Z" fill="rgba(16, 185, 129, 0.25)" stroke="#34d399" stroke-width="1.5"/>
+                    <text x="65" y="-50" text-anchor="middle" fill="#a7f3d0" font-size="12" font-weight="bold">4: LIB</text>
+
+                    <!-- Sector 5: VM -->
+                    <path class="onion-sector" id="sec-5" onclick="selectComponent('5')" d="M 124,-38 A 130 130 0 0 1 76,105 L 35,48 A 60 60 0 0 0 57,-17 Z" fill="rgba(16, 185, 129, 0.35)" stroke="#34d399" stroke-width="1.5"/>
+                    <text x="60" y="30" text-anchor="middle" fill="#a7f3d0" font-size="12" font-weight="bold">5: VM</text>
+
+                    <!-- Sector 1: Scheduler -->
+                    <path class="onion-sector" id="sec-1" onclick="selectComponent('1')" d="M 76,105 A 130 130 0 0 1 -76,105 L -35,48 A 60 60 0 0 0 35,48 Z" fill="rgba(16, 185, 129, 0.25)" stroke="#34d399" stroke-width="1.5"/>
+                    <text x="0" y="80" text-anchor="middle" fill="#a7f3d0" font-size="12" font-weight="bold">1: Scheduler</text>
+
+                    <!-- Sector 2: Drivers -->
+                    <path class="onion-sector" id="sec-2" onclick="selectComponent('2')" d="M -76,105 A 130 130 0 0 1 -38,-124 L -17,-57 A 60 60 0 0 0 -35,48 Z" fill="rgba(16, 185, 129, 0.35)" stroke="#34d399" stroke-width="1.5"/>
+                    <text x="-60" y="-10" text-anchor="middle" fill="#a7f3d0" font-size="12" font-weight="bold">2: Drivers</text>
+
+                    <!-- Center A: HW -->
+                    <circle class="onion-sector" id="sec-A" onclick="selectComponent('A')" cx="0" cy="0" r="60" fill="#d97706" stroke="#f59e0b" stroke-width="2.5"/>
+                    <text x="0" y="5" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="extrabold">A: HW</text>
+                </svg>
+            </div>
+
+        </section>
+
+        <!-- Right Side: Component Details Inspector (4 Cols) -->
+        <aside class="lg:col-span-4 flex flex-col gap-4">
+            
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col h-full sticky top-20">
+                
+                <!-- Inspector Header -->
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-emerald-400 text-lg"></i>
+                        <h2 class="font-bold text-base text-slate-100">Detail Prvku</h2>
+                    </div>
+                    <span id="detailBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                        Vyberte prvek
+                    </span>
+                </div>
+
+                <!-- Component Details Body -->
+                <div id="inspectorContent" class="space-y-4 flex-1 custom-scrollbar overflow-y-auto pr-1">
+                    <div class="text-center py-12 text-slate-500">
+                        <i class="fa-solid fa-hand-pointer text-3xl mb-3 block opacity-50"></i>
+                        <p class="text-sm">Klikněte na jakoukoliv vrstvu (A–F) nebo podsystém (1–9) v diagramu pro zobrazení podrobných informací.</p>
+                    </div>
+                </div>
+
+                <!-- Syscall Flow Widget -->
+                <div class="mt-6 pt-4 border-t border-slate-800 bg-slate-950/50 rounded-xl p-3">
+                    <h3 class="text-xs font-bold text-slate-300 mb-2 flex items-center justify-between">
+                        <span>Tok Operace v Architektuře</span>
+                        <i class="fa-solid fa-arrows-spin text-emerald-400"></i>
+                    </h3>
+                    <div class="space-y-1 font-mono text-[10px]">
+                        <div class="p-1.5 rounded bg-purple-950/40 border border-purple-700/40 text-purple-300">
+                            F+ GUI / E+ Xserver / 6-9 User space
+                        </div>
+                        <div class="p-1.5 rounded bg-sky-950/40 border border-sky-600/40 text-sky-300">
+                            8D LIB (libc) připraví volání SYSCALL
+                        </div>
+                        <div class="p-1.5 rounded bg-rose-950/40 border border-rose-600/40 text-rose-300">
+                            C Vrstva ochrany přepne CPU z Ring 3 na Ring 0
+                        </div>
+                        <div class="p-1.5 rounded bg-emerald-950/40 border border-emerald-600/40 text-emerald-300">
+                            B Kernel (1 Scheduler, 3 FS, 5 VM, 2 Drivers)
+                        </div>
+                        <div class="p-1.5 rounded bg-amber-950/40 border border-amber-600/40 text-amber-300">
+                            A HW fyzicky vykoná operaci
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </aside>
+
+    </main>
+
+    <script>
+        // Exact mapping matching user's document "Linuxové jádro.pdf"
+        const linuxOnionData = {
+            'A': {
+                code: 'A',
+                title: 'A - HW (Hardware)',
+                layer: 'Fyzická vrstva',
+                badge: 'CENTRAL HARDWARE',
+                badgeClass: 'bg-amber-950 text-amber-300 border-amber-700',
+                icon: 'fa-microchip text-amber-400',
+                executables: 'CPU (x86_64, ARM), MMU, RAM, Disky (NVMe/SSD), NIC, PCIe, GPU',
+                description: 'Fyzický základ počítače v samém středu architektury. Obsahuje procesory, paměťové moduly, řadiče disků a periferní zařízení.',
+                keyFunctions: [
+                    'Hardware poskytuje výpočetní výkon a fyzické uložení dat.',
+                    'Hardware sám vynucuje izolaci paměti přes Ring 0 (Kernel) a Ring 3 (User).',
+                    'Generuje hardwarová přerušení (IRQ) pro jádro.'
+                ],
+                codeExample: `Hardware IRQ -> Interrupt Vector -> CPU Interrupt Handler in Kernel`
+            },
+            'B': {
+                code: 'B',
+                title: 'B - Kernel (Slupka jádra)',
+                layer: 'Mód jádra (Kernel mode - Ring 0)',
+                badge: 'KERNEL MODE',
+                badgeClass: 'bg-emerald-950 text-emerald-300 border-emerald-700',
+                icon: 'fa-shield-halved text-emerald-400',
+                executables: 'vmlinuz, moduly jádra (.ko)',
+                description: 'Celá slupka tvořící mód jádra. Zahrnuje klíčové podsystémy 1 až 5 (Scheduler, Drivers, Filesystem, LIB, Virtual Memory). Má neomezený přístup k hardwaru.',
+                keyFunctions: [
+                    'Monolitické jádro s dynamicky načítatelnými moduly.',
+                    'Přímé řízení hardwaru a bezpečné sdílení zdrojů mezi procesy.',
+                    'Garantuje stabilitu a běh celého operačního systému.'
+                ],
+                codeExample: `// Kód běží plně v privilgovaném režimu Ring 0
+asmlinkage long sys_write(unsigned int fd, const char __user *buf, size_t count);`
+            },
+            '1': {
+                code: '1',
+                title: '1 - Scheduler (Plánovač)',
+                layer: 'Součást B (Kernel mode)',
+                badge: 'KERNEL SUBSYSTEM',
+                badgeClass: 'bg-emerald-950 text-emerald-300 border-emerald-700',
+                icon: 'fa-diagram-project text-emerald-400',
+                executables: 'kernel/sched/ (CFS / EEVDF scheduler)',
+                description: 'Přiděluje procesorový čas jednotlivým běžícím procesům a vláknům. Zajišťuje plynulý chod a spravedlivé rozdělení CPU.',
+                keyFunctions: [
+                    'Plánování běhu procesů (Completely Fair Scheduler).',
+                    'Přepínání kontextu mezi vlákny (Context switching).',
+                    'Řízení priorit procesů a víceprocesorového (SMP) zatížení.'
+                ],
+                codeExample: `// Struktura reprezentující proces v jádře
+struct task_struct *p = current;
+schedule(); // Vyvolání přepnutí kontextu`
+            },
+            '2': {
+                code: '2',
+                title: '2 - Drivers (Ovladače)',
+                layer: 'Součást B (Kernel mode)',
+                badge: 'KERNEL SUBSYSTEM',
+                badgeClass: 'bg-emerald-950 text-emerald-300 border-emerald-700',
+                icon: 'fa-hard-drive text-emerald-400',
+                executables: 'drivers/ (char, block, net, gpu)',
+                description: 'Moduly jádra zajišťující komunikaci s konkrétními HW zařízeními (disky, síťové karty, grafické karty, USB).',
+                keyFunctions: [
+                    'Překlad obecných požadavků jádra na konkrétní instrukce zařízení.',
+                    'Obsluha přerušení z hardwaru (ISR / Top & Bottom halves).',
+                    'Znaková zařízení (char devices) a bloková zařízení (block devices).'
+                ],
+                codeExample: `static struct file_operations fops = {
+    .read = my_driver_read,
+    .write = my_driver_write,
+};`
+            },
+            '3': {
+                code: '3B',
+                title: '3 - FS: Filesystem (Souborový systém)',
+                layer: 'Součást B (Kernel mode)',
+                badge: 'KERNEL SUBSYSTEM',
+                badgeClass: 'bg-emerald-950 text-emerald-300 border-emerald-700',
+                icon: 'fa-folder-tree text-emerald-400',
+                executables: 'fs/ (VFS, ext4, Btrfs, XFS, procfs, sysfs)',
+                description: 'Správa souborů, adresářové struktury a přístupových práv na discích skrze jednotné rozhraní VFS (Virtual File System).',
+                keyFunctions: [
+                    'Abstrakce souborového systému pomocí VFS (inodes, dentries).',
+                    'Kešování čtení a zápisu (Page Cache / Buffer Cache).',
+                    'Virtuální souborové systémy jako /proc a /sys pro stav jádra.'
+                ],
+                codeExample: `struct inode *inode = file->f_path.dentry->d_inode;
+vfs_read(file, buf, count, &pos);`
+            },
+            '4': {
+                code: '4',
+                title: '4 - LIB: Knihovny (Jádra)',
+                layer: 'Součást B (Kernel mode)',
+                badge: 'KERNEL SUBSYSTEM',
+                badgeClass: 'bg-emerald-950 text-emerald-300 border-emerald-700',
+                icon: 'fa-code text-emerald-400',
+                executables: 'lib/ (printk, string, crc32, crypto, idr)',
+                description: 'Interní pomocné knihovny a pomocné funkce využívané přímo kódem jádra a ovladači (neplést s uživatelskou libc).',
+                keyFunctions: [
+                    'Pomocné krypto a kompresní algoritmy v jádře.',
+                    'Formátovací a řetězcové funkce pro kernel space (`printk`, `sprintf`).',
+                    'Datové struktury (Spojové seznamy, Červeno-černé stromy, Hash tabulky).'
+                ],
+                codeExample: `printk(KERN_INFO "Kernel module initialized successfully\\n");
+LIST_HEAD(my_list);`
+            },
+            '5': {
+                code: '5',
+                title: '5 - VM: Virtual memory (Virtuální paměť)',
+                layer: 'Součást B (Kernel mode)',
+                badge: 'KERNEL SUBSYSTEM',
+                badgeClass: 'bg-emerald-950 text-emerald-300 border-emerald-700',
+                icon: 'fa-memory text-emerald-400',
+                executables: 'mm/ (page_alloc, slab, rmap, vmscan)',
+                description: 'Správa virtuálního adresního prostoru procesů, alokace fyzických stránek RAM a odkládání paměti na disk (Swap).',
+                keyFunctions: [
+                    'Překlad virtuálních adres na fyzické adresy.',
+                    'Buddy System pro alokaci stránek a SLUB Allocator pro malé objekty.',
+                    'Stránkování na disk (Swapping) a OOM (Out-of-Memory) Killer.'
+                ],
+                codeExample: `void *ptr = kmalloc(1024, GFP_KERNEL);
+unsigned long page = __get_free_page(GFP_KERNEL);`
+            },
+            'C': {
+                code: 'C',
+                title: 'C - Vrstva ochrany systému',
+                layer: 'Hranice přepínání režimů (Syscall Boundary)',
+                badge: 'PROTECTION BOUNDARY',
+                badgeClass: 'bg-rose-950 text-rose-300 border-rose-700',
+                icon: 'fa-shield text-rose-400',
+                executables: 'SYSCALL / SYSENTER, sys_call_table, Ring 3 -> Ring 0',
+                description: 'Chrání systém před nestabilitou. Zabezpečuje přechod procesoru z uživatelského režimu (Ring 3) do režimu jádra (Ring 0) a kontroluje oprávněnost požadovaných operací.',
+                keyFunctions: [
+                    'Izolace uživatelských aplikací od přímého hardwaru.',
+                    'Validace parametrů předaných z uživatelského prostoru.',
+                    'Bezpečné přepnutí kontextu z user-stacku na kernel-stack.'
+                ],
+                codeExample: `// Mechanismus SYSCALL instrukce
+mov eax, 1     // Syscall číslo pro sys_write
+syscall        // Přepnutí CPU do Ring 0 (Vrstva C)`
+            },
+            'D': {
+                code: 'D+',
+                title: 'D+ - User space (Uživatelský prostor)',
+                layer: 'Uživatelský mód (User mode - Ring 3)',
+                badge: 'USER MODE',
+                badgeClass: 'bg-sky-950 text-sky-300 border-sky-700',
+                icon: 'fa-users text-sky-400',
+                executables: 'Uživatelské procesy (6, 7, 8, 9)',
+                description: 'Uživatelský prostor tvořící uživatelský mód (Ring 3). Programy zde nemohou přímo přistupovat k HW, ale komunikují přes vrstvu C.',
+                keyFunctions: [
+                    'Izolovaný virtuální adresní prostor pro každý proces.',
+                    'Nemůže přímo zapisovat do paměti jádra ani do HW.',
+                    'Při chybě aplikace spadne pouze daný proces (pád nepoloží celý systém).'
+                ],
+                codeExample: `// Uživatelský proces běží v Ring 3
+int main() {
+    printf("Running in User Space\\n");
+}`
+            },
+            '6': {
+                code: '6',
+                title: '6 - Shell',
+                layer: 'Součást D+ (User space)',
+                badge: 'USER COMPONENT',
+                badgeClass: 'bg-sky-950 text-sky-300 border-sky-700',
+                icon: 'fa-terminal text-sky-400',
+                executables: '/bin/bash, /bin/zsh, /bin/sh, fish',
+                description: 'Příkazový řádek / interpret příkazů. Umožňuje uživateli zadávat příkazy a spouštět ostatní utility a programy.',
+                keyFunctions: [
+                    'Nástroj pro meziprocesovou komunikaci (Pipes `|`, přesměrování `>`).',
+                    'Skriptování v prostředí Linuxu.',
+                    'Příprava a spouštění procesů přes `fork()` a `execve()`.'
+                ],
+                codeExample: `$ ls -la /var/log | grep syslog`
+            },
+            '7': {
+                code: '7',
+                title: '7 - Utility',
+                layer: 'Součást D+ (User space)',
+                badge: 'USER COMPONENT',
+                badgeClass: 'bg-sky-950 text-sky-300 border-sky-700',
+                icon: 'fa-wrench text-sky-400',
+                executables: 'coreutils (ls, cat, grep, awk, top, ps, tar)',
+                description: 'Standardní systémové nástroje a utility pro práci s textem, soubory, procesy a správou systému.',
+                keyFunctions: [
+                    'Běžné systémové operace s daty a soubory.',
+                    'Sledování vytížení systému (top, htop).',
+                    'Nástroje vyvíjené standardně podle normy POSIX.'
+                ],
+                codeExample: `$ grep -rn "ERROR" /var/log/syslog`
+            },
+            '8': {
+                code: '8D',
+                title: '8 - LIB (libc)',
+                layer: 'Součást D+ (User space)',
+                badge: 'USER LIBRARY',
+                badgeClass: 'bg-sky-950 text-sky-300 border-sky-700',
+                icon: 'fa-cube text-sky-400',
+                executables: 'glibc (libc.so.6), musl, libpthread',
+                description: 'Standardní C knihovna v uživatelském prostoru. Poskytuje rozhraní API (printf, malloc, open) a obaluje systémová volání.',
+                keyFunctions: [
+                    'Poskytuje standardní funkce jazyka C a rozhraní POSIX.',
+                    'Překládá API volání na nízkoúrovňový instrukční kód SYSCALL.',
+                    'Správa uživatelské paměti haldy (malloc/free).'
+                ],
+                codeExample: `// C knihovna obalí syscall open()
+int fd = open("soubor.txt", O_RDONLY);`
+            },
+            '9': {
+                code: '9',
+                title: '9 - Sys apps (Systémové aplikace)',
+                layer: 'Součást D+ (User space)',
+                badge: 'USER COMPONENT',
+                badgeClass: 'bg-sky-950 text-sky-300 border-sky-700',
+                icon: 'fa-gears text-sky-400',
+                executables: 'systemd, sshd, dockerd, cron, NetworkManager',
+                description: 'Systémové služby (démoni) běžící na pozadí uživatelského prostoru, které zajišťují chod sítě, spouštění služeb a správu systému.',
+                keyFunctions: [
+                    'Inicializace systému (Init / systemd PID 1).',
+                    'Síťové služby a vzdálená správa (SSH démon).',
+                    'Kontejnerizace a plánované úlohy.'
+                ],
+                codeExample: `$ systemctl status sshd.service`
+            },
+            'E': {
+                code: 'E+',
+                title: 'E+ - Grafická nadstavba - Xserver',
+                layer: 'Grafický podsystém',
+                badge: 'GRAPHICS DISPLAY SERVER',
+                badgeClass: 'bg-indigo-950 text-indigo-300 border-indigo-700',
+                icon: 'fa-desktop text-indigo-400',
+                executables: 'X.Org Server (X11), Wayland Compositor (Mutter, KWin)',
+                description: 'Zajišťuje zobrazení grafického rozhraní, komunikaci s grafickou kartou (přes DRI/DRM) a odchytávání vstupních událostí myši a klávesnice.',
+                keyFunctions: [
+                    'Server pro správu okenního rozhraní a grafických vstupů/výstupů.',
+                    'Protokol X11 nebo modernější protokol Wayland.',
+                    'Předávání událostí grafickým aplikacím.'
+                ],
+                codeExample: `// Spuštění grafického serveru
+$ startx`
+            },
+            'F': {
+                code: 'F+',
+                title: 'F+ - Grafická nadstavba - GUI balíky',
+                layer: 'Uživatelské GUI rozhraní',
+                badge: 'GUI ENVIRONMENT',
+                badgeClass: 'bg-purple-950 text-purple-300 border-purple-700',
+                icon: 'fa-window-maximize text-purple-400',
+                executables: 'GNOME, KDE Plasma, XFCE, GTK, Qt, Firefox, LibreOffice',
+                description: 'Vysokoúrovňové grafické prostředí (Desktop Environments) a GUI aplikace určené pro koncového uživatele.',
+                keyFunctions: [
+                    'Kompletní uživatelské grafické prostředí.',
+                    'Grafické knihovny GTK a Qt pro tvorbu okenních aplikací.',
+                    'Přívětivé ovládání okenního systému.'
+                ],
+                codeExample: `// Aplikace psaná např. v GTK / Qt rozhraní
+GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);`
+            }
+        };
+
+        let selectedId = null;
+        let demoInterval = null;
+
+        function switchView(mode) {
+            const onion = document.getElementById('onionContainer');
+            const stack = document.getElementById('stackContainer');
+            const btnOnion = document.getElementById('btnOnionView');
+            const btnStack = document.getElementById('btnStackView');
+
+            if (mode === 'onion') {
+                onion.classList.remove('hidden');
+                onion.classList.add('flex');
+                stack.classList.add('hidden');
+                btnOnion.className = "px-3 py-1 text-xs font-medium rounded-md bg-emerald-600 text-white transition-all";
+                btnStack.className = "px-3 py-1 text-xs font-medium rounded-md text-slate-400 hover:text-white transition-all";
+            } else {
+                onion.classList.add('hidden');
+                onion.classList.remove('flex');
+                stack.classList.remove('hidden');
+                btnStack.className = "px-3 py-1 text-xs font-medium rounded-md bg-emerald-600 text-white transition-all";
+                btnOnion.className = "px-3 py-1 text-xs font-medium rounded-md text-slate-400 hover:text-white transition-all";
+            }
+        }
+
+        function selectComponent(id) {
+            const data = linuxOnionData[id];
+            if (!data) return;
+
+            // Clear previous highlight
+            if (selectedId) {
+                const prevSvgSec = document.getElementById(`sec-${selectedId}`);
+                if (prevSvgSec) prevSvgSec.classList.remove('active');
+
+                const prevComp = document.getElementById(`comp-${selectedId}`);
+                if (prevComp) prevComp.classList.remove('ring-4', 'ring-amber-400', 'ring-emerald-400');
+            }
+
+            selectedId = id;
+
+            // Highlight in SVG
+            const svgSec = document.getElementById(`sec-${id}`);
+            if (svgSec) svgSec.classList.add('active');
+
+            // Highlight in Stack view
+            const compElem = document.getElementById(`comp-${id}`);
+            if (compElem) compElem.classList.add('ring-4', 'ring-amber-400');
+
+            // Update badge
+            const badgeElem = document.getElementById('detailBadge');
+            badgeElem.textContent = data.badge;
+            badgeElem.className = `text-[10px] font-mono px-2 py-0.5 rounded border ${data.badgeClass}`;
+
+            // Update Inspector Content
+            const inspector = document.getElementById('inspectorContent');
+            inspector.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="p-2.5 bg-slate-800 rounded-xl border border-slate-700 text-xl">
+                            <i class="fa-solid ${data.icon}"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-100 leading-snug">${data.title}</h3>
+                            <div class="text-[11px] text-slate-400 font-mono mt-0.5">${data.layer}</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800/80 text-xs text-slate-300">
+                        <span class="font-semibold text-slate-200 block mb-1">Popis funkce:</span>
+                        <p class="leading-relaxed text-slate-400">${data.description}</p>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-semibold text-slate-200 block">Soubory / Binarity:</span>
+                        <div class="p-2 bg-slate-950 rounded border border-slate-800/60 font-mono text-[11px] text-emerald-300 break-all">
+                            ${data.executables}
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-semibold text-slate-200 block">Klíčové vlastnosti:</span>
+                        <ul class="space-y-1 text-xs text-slate-400">
+                            ${data.keyFunctions.map(f => `<li class="flex items-start gap-1.5"><i class="fa-solid fa-angle-right text-emerald-400 text-[10px] mt-1"></i> <span>${f}</span></li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-semibold text-slate-200 block">Kód / Ukázka:</span>
+                        <pre class="p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-[10px] font-mono text-emerald-400 overflow-x-auto custom-scrollbar"><code>${escapeHtml(data.codeExample)}</code></pre>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Live search filter
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) {
+                Object.keys(linuxOnionData).forEach(id => {
+                    const elSvg = document.getElementById(`sec-${id}`);
+                    if (elSvg) elSvg.style.opacity = '1';
+                    const elStack = document.getElementById(`comp-${id}`);
+                    if (elStack) elStack.style.opacity = '1';
+                });
+                return;
+            }
+
+            Object.keys(linuxOnionData).forEach(id => {
+                const item = linuxOnionData[id];
+                const match = item.title.toLowerCase().includes(query) || 
+                              item.description.toLowerCase().includes(query) || 
+                              item.executables.toLowerCase().includes(query) ||
+                              id.toLowerCase().includes(query);
+                
+                const elSvg = document.getElementById(`sec-${id}`);
+                if (elSvg) elSvg.style.opacity = match ? '1' : '0.15';
+
+                const elStack = document.getElementById(`comp-${id}`);
+                if (elStack) elStack.style.opacity = match ? '1' : '0.2';
+            });
+        });
+
+        function startSyscallDemo() {
+            stopSyscallDemo();
+            const banner = document.getElementById('demoBanner');
+            const stepText = document.getElementById('demoStepText');
+            banner.classList.remove('hidden');
+
+            const steps = [
+                { id: 'F', text: '1/6: Vrstva F+ (GUI): Uživatel klikne na tlačítko v aplikaci LibreOffice...' },
+                { id: '8', text: '2/6: Vrstva 8D (LIB libc): Funkce fwrite() připraví volání SYSCALL...' },
+                { id: 'C', text: '3/6: Vrstva C (Ochrana): CPU přepne z Ring 3 do Ring 0 a ověří instrukci...' },
+                { id: '3', text: '4/6: Vrstva 3B (Filesystem): VFS předá požadavek souborovému systému ext4...' },
+                { id: '2', text: '5/6: Vrstva 2 (Drivers): Ovladač NVMe disku připraví přenos dat...' },
+                { id: 'A', text: '6/6: Vrstva A (HW): NVMe disk fyzicky zapíše datové bloky do paměti flash.' }
+            ];
+
+            let currentStep = 0;
+            
+            function nextStep() {
+                if (currentStep >= steps.length) {
+                    currentStep = 0;
+                }
+                const step = steps[currentStep];
+                stepText.textContent = step.text;
+                selectComponent(step.id);
+                currentStep++;
+            }
+
+            nextStep();
+            demoInterval = setInterval(nextStep, 2600);
+        }
+
+        function stopSyscallDemo() {
+            if (demoInterval) {
+                clearInterval(demoInterval);
+                demoInterval = null;
+            }
+            document.getElementById('demoBanner').classList.add('hidden');
+        }
+
+        function resetDiagram() {
+            stopSyscallDemo();
+            document.getElementById('searchInput').value = '';
+            Object.keys(linuxOnionData).forEach(id => {
+                const elSvg = document.getElementById(`sec-${id}`);
+                if (elSvg) {
+                    elSvg.style.opacity = '1';
+                    elSvg.classList.remove('active');
+                }
+                const elStack = document.getElementById(`comp-${id}`);
+                if (elStack) {
+                    elStack.style.opacity = '1';
+                    elStack.classList.remove('ring-4', 'ring-amber-400');
+                }
+            });
+            selectComponent('8');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            switchView('stack');
+            selectComponent('8');
+        });
+    </script>
+</body>
+</html>
