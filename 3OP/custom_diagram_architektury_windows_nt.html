@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="cs" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktivní Architektura Windows NT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        ring3: {
+                            light: '#38bdf8',
+                            DEFAULT: '#0284c7',
+                            dark: '#0369a1',
+                            bg: 'rgba(14, 165, 233, 0.08)'
+                        },
+                        ring0: {
+                            light: '#f43f5e',
+                            DEFAULT: '#e11d48',
+                            dark: '#be123c',
+                            bg: 'rgba(244, 63, 94, 0.08)'
+                        },
+                        hal: {
+                            light: '#a855f7',
+                            DEFAULT: '#9333ea',
+                            dark: '#7e22ce'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .component-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .component-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.5);
+        }
+        .pulse-border {
+            animation: borderPulse 2s infinite;
+        }
+        @keyframes borderPulse {
+            0%, 100% { border-color: rgba(56, 189, 248, 0.4); }
+            50% { border-color: rgba(56, 189, 248, 1); }
+        }
+        .syscall-path {
+            stroke-dasharray: 8;
+            animation: dash 1s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -16; }
+        }
+    </style>
+</head>
+<body class="h-full font-sans antialiased flex flex-col custom-scrollbar overflow-x-hidden">
+
+    <!-- Top Header Navigation -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/20">
+                    <i class="fa-brands fa-windows text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Architektura Windows NT
+                        <span class="text-xs font-mono font-normal px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800/50">v6.x / 10 / 11</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Interaktivní schématický diagram bezpečnostních vrstev a komponent jádra</p>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="flex items-center flex-wrap gap-2 w-full md:w-auto">
+                <!-- Search Box -->
+                <div class="relative flex-1 md:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Hledat komponentu (např. VMM, HAL, POSIX)..." 
+                        class="w-full pl-9 pr-3 py-1.5 bg-slate-950 border border-slate-700/80 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors">
+                </div>
+                
+                <!-- Action Buttons -->
+                <button onclick="startSyscallDemo()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 shadow-md shadow-amber-600/20">
+                    <i class="fa-solid fa-play text-xs"></i>
+                    <span>Simulovat Tok Volání</span>
+                </button>
+
+                <button onclick="resetDiagram()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate text-xs"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Side: Interactive Architecture Diagram (8 Cols) -->
+        <section class="lg:col-span-8 flex flex-col gap-4">
+            
+            <!-- System Call Animation Alert Banner -->
+            <div id="demoBanner" class="hidden bg-sky-950/80 border border-sky-500/50 rounded-xl p-3 text-sm text-sky-200 flex items-center justify-between animate-fade-in">
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                    </span>
+                    <span id="demoStepText">Probíhá simulace toku systémového volání...</span>
+                </div>
+                <button onclick="stopSyscallDemo()" class="text-xs text-sky-400 hover:text-white underline">Zrušit</button>
+            </div>
+
+            <!-- Architectural Legend / Ring Toggle Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs text-slate-400">
+                <div class="flex items-center gap-4">
+                    <span class="font-semibold text-slate-300">Schéma NT podle šablony:</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500"></span> Win32 App</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-600"></span> POSIX App</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-purple-600"></span> OS/2 App</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-900/80 border border-amber-600"></span> Hardware</span>
+                </div>
+                <div class="text-slate-500 hidden sm:block">
+                    <i class="fa-solid fa-mouse-pointer mr-1"></i> Klikněte pro detail
+                </div>
+            </div>
+
+            <!-- DIAGRAM CONTAINER MATCHING TEMPLATE -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xl relative overflow-hidden flex flex-col gap-5">
+                
+                <!-- 1. TOP APPLICATIONS LAYER -->
+                <div class="grid grid-cols-3 gap-3 max-w-xl mx-auto w-full">
+                    <!-- Win32 Application -->
+                    <div onclick="selectComponent('app_win32')" id="comp-app_win32" class="component-card cursor-pointer p-2.5 rounded-lg bg-amber-500 text-slate-950 font-bold text-center border-2 border-amber-400 shadow-md hover:bg-amber-400">
+                        <div class="text-xs uppercase tracking-wide">Win32</div>
+                        <div class="text-[10px] font-normal opacity-90">application</div>
+                    </div>
+                    <!-- POSIX Application -->
+                    <div onclick="selectComponent('app_posix')" id="comp-app_posix" class="component-card cursor-pointer p-2.5 rounded-lg bg-emerald-600 text-white font-bold text-center border-2 border-emerald-400 shadow-md hover:bg-emerald-500">
+                        <div class="text-xs uppercase tracking-wide">POSIX</div>
+                        <div class="text-[10px] font-normal opacity-90">application</div>
+                    </div>
+                    <!-- OS/2 Application -->
+                    <div onclick="selectComponent('app_os2')" id="comp-app_os2" class="component-card cursor-pointer p-2.5 rounded-lg bg-fuchsia-700 text-white font-bold text-center border-2 border-fuchsia-500 shadow-md hover:bg-fuchsia-600">
+                        <div class="text-xs uppercase tracking-wide">OS/2</div>
+                        <div class="text-[10px] font-normal opacity-90">application</div>
+                    </div>
+                </div>
+
+                <!-- Vertical Flow Arrows -->
+                <div class="flex justify-around text-amber-500 text-xs px-12 -my-2">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                </div>
+
+                <!-- 2. USER MODE CONTAINER (BLUE) -->
+                <div class="relative bg-sky-500/20 border-2 border-sky-400/80 rounded-xl p-4 transition-all" id="layerUserMode">
+                    <div class="font-bold text-sky-300 text-sm mb-3 flex items-center justify-between">
+                        <span>User mode</span>
+                        <span class="text-[10px] font-mono font-normal bg-sky-950 px-2 py-0.5 rounded border border-sky-700">Ring 3</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Integral Subsystems -->
+                        <div class="border border-sky-300/40 rounded-lg p-3 bg-slate-900/80 flex flex-col justify-between">
+                            <div class="font-semibold text-xs text-slate-200 mb-2 border-b border-slate-700 pb-1">Integral subsystems</div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div onclick="selectComponent('int_workstation')" id="comp-int_workstation" class="component-card cursor-pointer p-2 rounded bg-slate-800 border border-slate-600 text-center text-[11px] text-slate-200 hover:border-sky-400">
+                                    Work-station service
+                                </div>
+                                <div onclick="selectComponent('int_server')" id="comp-int_server" class="component-card cursor-pointer p-2 rounded bg-slate-800 border border-slate-600 text-center text-[11px] text-slate-200 hover:border-sky-400">
+                                    Server service
+                                </div>
+                                <div onclick="selectComponent('int_security')" id="comp-int_security" class="component-card cursor-pointer p-2 rounded bg-slate-800 border border-slate-600 text-center text-[11px] text-slate-200 hover:border-sky-400">
+                                    Security
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Environment Subsystems -->
+                        <div class="border border-sky-300/40 rounded-lg p-3 bg-slate-900/80 flex flex-col justify-between relative">
+                            <div class="font-semibold text-xs text-slate-200 mb-2 border-b border-slate-700 pb-1">Environment subsystems</div>
+                            <div class="grid grid-cols-3 gap-2 relative">
+                                <div onclick="selectComponent('env_win32')" id="comp-env_win32" class="component-card cursor-pointer p-2 rounded bg-slate-800 border border-amber-500/80 text-center text-[11px] font-semibold text-amber-300 hover:bg-slate-700">
+                                    Win32
+                                </div>
+                                <div onclick="selectComponent('env_posix')" id="comp-env_posix" class="component-card cursor-pointer p-2 rounded bg-slate-800 border border-emerald-500/80 text-center text-[11px] font-semibold text-emerald-300 hover:bg-slate-700">
+                                    POSIX
+                                </div>
+                                <div onclick="selectComponent('env_os2')" id="comp-env_os2" class="component-card cursor-pointer p-2 rounded bg-slate-800 border border-fuchsia-500/80 text-center text-[11px] font-semibold text-fuchsia-300 hover:bg-slate-700">
+                                    OS/2
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boundary Arrows (User Mode <-> Kernel Mode) -->
+                <div class="flex justify-around text-sky-400 text-sm -my-2 z-10">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                </div>
+
+                <!-- 3. KERNEL MODE CONTAINER (DARK BLUE/PURPLE) -->
+                <div class="relative bg-indigo-950/40 border-2 border-indigo-500/80 rounded-xl p-4 transition-all" id="layerKernelMode">
+                    <div class="font-bold text-indigo-300 text-sm mb-3 flex items-center justify-between">
+                        <span>Kernel mode</span>
+                        <span class="text-[10px] font-mono font-normal bg-indigo-950 px-2 py-0.5 rounded border border-indigo-700">Ring 0</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- Executive Box (Grey Container) -->
+                        <div class="border-2 border-slate-500/60 rounded-xl p-3 bg-slate-800/90 space-y-3">
+                            <div class="font-bold text-xs text-slate-300 tracking-wide">Executive</div>
+
+                            <!-- Executive Services Top Bar -->
+                            <div onclick="selectComponent('exec_services')" id="comp-exec_services" class="component-card cursor-pointer p-2 bg-slate-200 text-slate-900 rounded font-semibold text-center text-xs hover:bg-white transition-colors border border-slate-400">
+                                Executive services
+                            </div>
+
+                            <!-- Executive Managers Grid -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2">
+                                <div onclick="selectComponent('io_mgr')" id="comp-io_mgr" class="component-card cursor-pointer p-2 rounded bg-slate-900 border border-slate-600 text-center text-[10px] font-medium text-slate-200 hover:border-sky-400 flex flex-col justify-center min-h-[50px]">
+                                    I/O manager
+                                </div>
+                                <div onclick="selectComponent('srm')" id="comp-srm" class="component-card cursor-pointer p-2 rounded bg-slate-900 border border-slate-600 text-center text-[9px] font-medium text-slate-200 hover:border-sky-400 flex flex-col justify-center min-h-[50px]">
+                                    Security reference monitor
+                                </div>
+                                <div onclick="selectComponent('ipc_mgr')" id="comp-ipc_mgr" class="component-card cursor-pointer p-2 rounded bg-slate-900 border border-slate-600 text-center text-[10px] font-medium text-slate-200 hover:border-sky-400 flex flex-col justify-center min-h-[50px]">
+                                    IPC manager
+                                </div>
+                                <div onclick="selectComponent('vmm')" id="comp-vmm" class="component-card cursor-pointer p-2 rounded bg-slate-900 border border-slate-600 text-center text-[9px] font-medium text-slate-200 hover:border-sky-400 flex flex-col justify-center min-h-[50px]">
+                                    Virtual memory manager (VMM)
+                                </div>
+                                <div onclick="selectComponent('proc_mgr')" id="comp-proc_mgr" class="component-card cursor-pointer p-2 rounded bg-slate-900 border border-slate-600 text-center text-[9px] font-medium text-slate-200 hover:border-sky-400 flex flex-col justify-center min-h-[50px]">
+                                    Process manager
+                                </div>
+                                <div onclick="selectComponent('pnp_mgr')" id="comp-pnp_mgr" class="component-card cursor-pointer p-2 rounded bg-slate-900 border border-slate-600 text-center text-[10px] font-medium text-slate-200 hover:border-sky-400 flex flex-col justify-center min-h-[50px]">
+                                    PnP manager
+                                </div>
+                                <div onclick="selectComponent('power_mgr')" id="comp-power_mgr" class="component-card cursor-pointer p-2 rounded bg-slate-900 border border-slate-600 text-center text-[10px] font-medium text-slate-200 hover:border-sky-400 flex flex-col justify-center min-h-[50px]">
+                                    Power manager
+                                </div>
+                                <div onclick="selectComponent('win_gdi')" id="comp-win_gdi" class="component-card cursor-pointer p-1.5 rounded bg-slate-900 border border-slate-600 text-center text-[9px] font-medium text-slate-200 hover:border-sky-400 flex flex-col justify-center min-h-[50px] gap-0.5">
+                                    <span class="border-b border-slate-700 pb-0.5">Window manager</span>
+                                    <span class="font-bold text-sky-400">GDI</span>
+                                </div>
+                            </div>
+
+                            <!-- Object Manager Base Bar -->
+                            <div onclick="selectComponent('obj_mgr')" id="comp-obj_mgr" class="component-card cursor-pointer p-2 bg-slate-200 text-slate-900 rounded font-semibold text-center text-xs hover:bg-white transition-colors border border-slate-400">
+                                Object manager
+                            </div>
+                        </div>
+
+                        <!-- Arrows between Executive and Drivers / Microkernel -->
+                        <div class="flex justify-around text-indigo-300 text-xs py-0.5">
+                            <i class="fa-solid fa-arrows-up-down"></i>
+                            <i class="fa-solid fa-arrows-up-down"></i>
+                        </div>
+
+                        <!-- Drivers and Microkernel Layer -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div onclick="selectComponent('kernel_drivers')" id="comp-kernel_drivers" class="component-card cursor-pointer p-3 bg-slate-200 text-slate-900 font-bold text-center rounded text-xs hover:bg-white transition-colors border border-slate-400">
+                                Kernel mode drivers
+                            </div>
+                            <div onclick="selectComponent('microkernel')" id="comp-microkernel" class="component-card cursor-pointer p-3 bg-slate-200 text-slate-900 font-bold text-center rounded text-xs hover:bg-white transition-colors border border-slate-400">
+                                Microkernel
+                            </div>
+                        </div>
+
+                        <!-- Arrows down to HAL -->
+                        <div class="flex justify-around text-indigo-300 text-xs py-0.5">
+                            <i class="fa-solid fa-arrows-up-down"></i>
+                            <i class="fa-solid fa-arrows-up-down"></i>
+                        </div>
+
+                        <!-- HAL (Hardware Abstraction Layer) -->
+                        <div onclick="selectComponent('hal')" id="comp-hal" class="component-card cursor-pointer p-3 bg-slate-200 text-slate-900 font-bold text-center rounded text-sm hover:bg-white transition-colors border border-slate-400">
+                            Hardware abstraction layer (HAL)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hardware Connection Arrow -->
+                <div class="text-center text-amber-500 text-base -my-1">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                </div>
+
+                <!-- 4. HARDWARE LAYER (BROWN BOX) -->
+                <div onclick="selectComponent('hardware')" id="comp-hardware" class="component-card cursor-pointer bg-amber-900/90 border-2 border-amber-600 text-amber-100 font-bold text-center p-3 rounded-xl hover:bg-amber-800 transition-colors shadow-lg">
+                    Hardware
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Right Side: Component Details Inspector (4 Cols) -->
+        <aside class="lg:col-span-4 flex flex-col gap-4">
+            
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col h-full sticky top-20">
+                
+                <!-- Inspector Header -->
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-sky-400 text-lg"></i>
+                        <h2 class="font-bold text-base text-slate-100">Detail Komponenty</h2>
+                    </div>
+                    <span id="detailBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800">
+                        Vyberte prvek
+                    </span>
+                </div>
+
+                <!-- Component Details Body -->
+                <div id="inspectorContent" class="space-y-4 flex-1 custom-scrollbar overflow-y-auto pr-1">
+                    <div class="text-center py-12 text-slate-500">
+                        <i class="fa-solid fa-hand-pointer text-3xl mb-3 block opacity-50"></i>
+                        <p class="text-sm">Klikněte na jakýkoliv blok na diagramu pro zobrazení podrobných informací podle architektury Windows NT.</p>
+                    </div>
+                </div>
+
+                <!-- Syscall Quick Flow Widget -->
+                <div class="mt-6 pt-4 border-t border-slate-800 bg-slate-950/50 rounded-xl p-3">
+                    <h3 class="text-xs font-bold text-slate-300 mb-2 flex items-center justify-between">
+                        <span>Tok Volání (Šablona NT)</span>
+                        <i class="fa-solid fa-route text-sky-400"></i>
+                    </h3>
+                    <div class="space-y-1 font-mono text-[10px]">
+                        <div class="p-1.5 rounded bg-amber-950/40 border border-amber-600/40 text-amber-300">
+                            1. Application (Win32 / POSIX / OS/2)
+                        </div>
+                        <div class="p-1.5 rounded bg-sky-950/40 border border-sky-600/40 text-sky-300">
+                            2. Environment Subsystem (csrss, posix, os2)
+                        </div>
+                        <div class="p-1.5 rounded bg-slate-800 border border-slate-600 text-slate-200">
+                            3. Executive Services & Managers
+                        </div>
+                        <div class="p-1.5 rounded bg-indigo-950/40 border border-indigo-600/40 text-indigo-300">
+                            4. Drivers / Microkernel & HAL
+                        </div>
+                        <div class="p-1.5 rounded bg-amber-900/40 border border-amber-600/40 text-amber-200">
+                            5. Hardware
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </aside>
+
+    </main>
+
+    <script>
+        // Data store updated strictly for the image template structure
+        const architectureData = {
+            app_win32: {
+                title: "Win32 Application",
+                layer: "Applications (User Mode)",
+                badge: "WIN32 APP",
+                badgeClass: "bg-amber-950 text-amber-400 border-amber-700",
+                icon: "fa-window-restore text-amber-400",
+                executables: "Win32 GUI/CLI spustitelné soubory (.exe)",
+                description: "Hlavní uživatelské aplikace v systému Windows NT (např. Word, Chrome, kalkulačka). Komunikují s prostředími Win32 přes rozhraní API.",
+                keyFunctions: [
+                    "Běží v neprivilegovaném uživatelském režimu (Ring 3).",
+                    "Přístup k funkcím systému získávají přes subsystém Win32.",
+                    "Isolované ve vlastním virtuálním adresním prostoru."
+                ],
+                codeExample: `// Volání z Win32 Aplikace
+CreateFile("C:\\\\file.txt", GENERIC_READ, ...);`
+            },
+            app_posix: {
+                title: "POSIX Application",
+                layer: "Applications (User Mode)",
+                badge: "POSIX APP",
+                badgeClass: "bg-emerald-950 text-emerald-400 border-emerald-700",
+                icon: "fa-terminal text-emerald-400",
+                executables: "UNIX/POSIX kompatibilní binární soubory",
+                description: "Aplikace psané podle standardu IEEE POSIX (přenositelné UNIXové programy). V NT architektuře běžely nad samostatným subsystémem POSIX.",
+                keyFunctions: [
+                    "Standardizované rozhraní POSIX.1.",
+                    "Překlad POSIX systémových volání na volání NT Executive.",
+                    "Umožňovaly běh UNIX nástrojů v prostředí NT."
+                ],
+                codeExample: `// POSIX volání
+int fd = open("/dev/null", O_RDWR);`
+            },
+            app_os2: {
+                title: "OS/2 Application",
+                layer: "Applications (User Mode)",
+                badge: "OS/2 APP",
+                badgeClass: "bg-fuchsia-950 text-fuchsia-400 border-fuchsia-700",
+                icon: "fa-floppy-disk text-fuchsia-400",
+                executables: "OS/2 1.x konzolové aplikace",
+                description: "Aplikace vyvinuté původně pro IBM OS/2 1.x. Windows NT obsahoval zpětnou kompatibilitu pro spouštění 16-bitových konzolových OS/2 aplikací.",
+                keyFunctions: [
+                    "Podpora pro OS/2 API volání.",
+                    "Spouštěno v izolovaném subsystému OS/2.",
+                    "Historický prvek architektonické univerzálnosti NT."
+                ],
+                codeExample: `// OS/2 API call
+DosWrite(1, "Hello OS/2", 10, &cbWritten);`
+            },
+            int_workstation: {
+                title: "Workstation service",
+                layer: "User Mode - Integral Subsystems",
+                badge: "INTEGRAL SERVICE",
+                badgeClass: "bg-sky-950 text-sky-400 border-sky-800",
+                icon: "fa-network-wired text-sky-400",
+                executables: "wkssvc.dll (svchost.exe)",
+                description: "Integrovaná systémová služba odpovědná za klientská síťová připojení a přesměrování síťových požadavků (SMB klientský redirector).",
+                keyFunctions: [
+                    "Vytváří a spravuje klientská síťová spojení k vzdáleným serverům.",
+                    "Spolupracuje se sítovým ovladačem RDBSS v režimu jádra."
+                ],
+                codeExample: `NetUseAdd(...); // Vytvoření síťového jednotky`
+            },
+            int_server: {
+                title: "Server service",
+                layer: "User Mode - Integral Subsystems",
+                badge: "INTEGRAL SERVICE",
+                badgeClass: "bg-sky-950 text-sky-400 border-sky-800",
+                icon: "fa-server text-sky-400",
+                executables: "srvsvc.dll (svchost.exe)",
+                description: "Služba poskytující sdílení souborů a tiskáren po síti pro ostatní počítače v síti.",
+                keyFunctions: [
+                    "Obsluhuje příchozí SMB požadavky ze sítě.",
+                    "Spravuje sdílené složky a oprávnění."
+                ],
+                codeExample: `NetShareAdd(...); // Přidání sdílené složky`
+            },
+            int_security: {
+                title: "Security (LSASS / Security Subsystem)",
+                layer: "User Mode - Integral Subsystems",
+                badge: "INTEGRAL SERVICE",
+                badgeClass: "bg-sky-950 text-sky-400 border-sky-800",
+                icon: "fa-shield-halved text-sky-400",
+                executables: "lsass.exe, winlogon.exe",
+                description: "Integrovaný bezpečnostní subsystém. Zpracovává přihlášení uživatelů, ověřuje hesla a generuje přístupové tokeny (Access Tokens).",
+                keyFunctions: [
+                    "Autentizace uživatelů (Kerberos / NTLM).",
+                    "Správa lokální bezpečnostní politiky (LSA).",
+                    "Komunikace se Security Reference Monitorem (SRM) v jádře."
+                ],
+                codeExample: `LsaLogonUser(...); // Autentizace uživatele`
+            },
+            env_win32: {
+                title: "Win32 Environment Subsystem",
+                layer: "User Mode - Environment Subsystems",
+                badge: "PRIMARY SUBSYSTEM",
+                badgeClass: "bg-amber-950 text-amber-300 border-amber-700",
+                icon: "fa-cubes text-amber-400",
+                executables: "csrss.exe, kernel32.dll, user32.dll, gdi32.dll",
+                description: "Klíčový subsystém prostředí NT. Řídí uživatelské rozhraní, oknový systém, konzole a správy procesů. Ostatní subsystémy s ním mohou komunikovat pro určité grafické operace.",
+                keyFunctions: [
+                    "Povinný subsystém v systému Windows NT.",
+                    "Spravuje konzolová okna a životní cyklus procesů.",
+                    "Exportuje Win32 API pro aplikace."
+                ],
+                codeExample: `// Win32 Subsystem Dispatch
+CsrClientCallServer(...);`
+            },
+            env_posix: {
+                title: "POSIX Environment Subsystem",
+                layer: "User Mode - Environment Subsystems",
+                badge: "SUBSYSTEM",
+                badgeClass: "bg-emerald-950 text-emerald-300 border-emerald-700",
+                icon: "fa-cube text-emerald-400",
+                executables: "psxss.exe, psxdll.dll",
+                description: "Subsystém poskytující prostředí pro běh POSIX aplikací. Překládá POSIX volání na nativní operace rozhraní NT Executive.",
+                keyFunctions: [
+                    "Emulace procesového modelu POSIX (fork, exec).",
+                    "Komunikace s Win32 subsystémem v případě potřeby."
+                ],
+                codeExample: `psxss.exe -> Executive Services`
+            },
+            env_os2: {
+                title: "OS/2 Environment Subsystem",
+                layer: "User Mode - Environment Subsystems",
+                badge: "SUBSYSTEM",
+                badgeClass: "bg-fuchsia-950 text-fuchsia-300 border-fuchsia-700",
+                icon: "fa-cube text-fuchsia-400",
+                executables: "os2ss.exe, os2srv.exe",
+                description: "Subsystém obsluhující OS/2 aplikace v prostředí NT.",
+                keyFunctions: [
+                    "Podpora OS/2 1.x konzolového prostředí.",
+                    "Mapování OS/2 API na volání NT Executive."
+                ],
+                codeExample: `os2ss.exe -> Executive Services`
+            },
+            exec_services: {
+                title: "Executive Services",
+                layer: "Kernel Mode - Executive",
+                badge: "RING 0 - EXECUTIVE TOP",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-layer-group text-sky-400",
+                executables: "ntoskrnl.exe (System Service Dispatcher)",
+                description: "Horní vrstva NT Executive, která přijímá systémová volání (Syscall) z uživatelského režimu a směruje je na odpovídající správce (Managers).",
+                keyFunctions: [
+                    "Rozhraní systémových volání (System Call Interface).",
+                    "Validace parametrů z uživatelského režimu.",
+                    "NT System Services (Nt* / Zw* v rozhraní Native API)."
+                ],
+                codeExample: `KiSystemServiceHandler() -> Dispatch to Manager`
+            },
+            io_mgr: {
+                title: "I/O manager",
+                layer: "Kernel Mode - Executive",
+                badge: "EXECUTIVE MANAGER",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-right-left text-sky-400",
+                executables: "ntoskrnl.exe (Io* components)",
+                description: "Spravuje veškeré vstupně-výstupní operace, souborové systémy a komunikaci s ovladači zařízením pomocí IRP paketů (I/O Request Packets).",
+                keyFunctions: [
+                    "Tvorba a správa IRP paketů.",
+                    "Cache Manager a Fast I/O.",
+                    "Správa souborových systémů (NTFS, FAT)."
+                ],
+                codeExample: `IoCallDriver(DeviceObject, Irp);`
+            },
+            srm: {
+                title: "Security reference monitor (SRM)",
+                layer: "Kernel Mode - Executive",
+                badge: "EXECUTIVE MANAGER",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-user-shield text-sky-400",
+                executables: "ntoskrnl.exe (Se* components)",
+                description: "Jádrová bezpečnostní komponenta. Kontroluje přístupová práva (DACL/SACL) uživatele při každém pokusu o otevření nebo manipulaci s objektem.",
+                keyFunctions: [
+                    "Vynucování bezpečnostních politik v Ring 0.",
+                    "Porovnávání Access Tokenu s ACL objektu.",
+                    "Generování bezpečnostních auditů."
+                ],
+                codeExample: `SeAccessCheck(SecurityDescriptor, AccessToken, ...);`
+            },
+            ipc_mgr: {
+                title: "IPC manager (ALPC / LPC)",
+                layer: "Kernel Mode - Executive",
+                badge: "EXECUTIVE MANAGER",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-comments text-sky-400",
+                executables: "ntoskrnl.exe (Lpc* / Alpc* components)",
+                description: "Správce meziprocesové komunikace (Inter-Process Communication). Zajišťuje rychlé předávání zpráv mezi procesy v uživatelském režimu a subsystémy.",
+                keyFunctions: [
+                    "Předávání zpráv přes paměťové porty jádra.",
+                    "Sdílené sekce paměti pro velké přenosy dat.",
+                    "Komunikace klient-server subsystémů."
+                ],
+                codeExample: `NtAlpcSendWaitReceivePort(...);`
+            },
+            vmm: {
+                title: "Virtual memory manager (VMM)",
+                layer: "Kernel Mode - Executive",
+                badge: "EXECUTIVE MANAGER",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-memory text-sky-400",
+                executables: "ntoskrnl.exe (Mm* / Mi* components)",
+                description: "Správce virtuální paměti. Přiděluje virtuální adresní prostor pro procesy, řídí stránkování (Paging) a odkládání na disk.",
+                keyFunctions: [
+                    "Správa 32-bit/64-bit virtuálního adresního prostoru.",
+                    "Paged a Non-Paged paměťové pooly jádra.",
+                    "Mapování souborů do paměti (Section Objects)."
+                ],
+                codeExample: `MmAllocateContiguousMemory(...);`
+            },
+            proc_mgr: {
+                title: "Process manager",
+                layer: "Kernel Mode - Executive",
+                badge: "EXECUTIVE MANAGER",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-diagram-project text-sky-400",
+                executables: "ntoskrnl.exe (Ps* / Psp* components)",
+                description: "Vytváří a spravuje struktury procesů (EPROCESS) a vláken (ETHREAD). Samotné plánování vykonávání vláken předává Mikrojádru.",
+                keyFunctions: [
+                    "Tvorba a ukončování procesů a vláken.",
+                    "Správa Job objektů.",
+                    "Sledování stavů vláken."
+                ],
+                codeExample: `PsCreateSystemThread(...);`
+            },
+            pnp_mgr: {
+                title: "PnP manager (Plug and Play)",
+                layer: "Kernel Mode - Executive",
+                badge: "EXECUTIVE MANAGER",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-plug text-sky-400",
+                executables: "ntoskrnl.exe (Pp* components)",
+                description: "Detekuje nově připojený hardware, načítá odpovídající ovladače a přiděluje hardwarové prostředky (IRQ, I/O porty).",
+                keyFunctions: [
+                    "Automatická detekce HW zřízení.",
+                    "Sestavování stromu zařízení (Device Tree).",
+                    "Zpracování IRP_MJ_PNP paketů."
+                ],
+                codeExample: `IoInvalidateDeviceRelations(...);`
+            },
+            power_mgr: {
+                title: "Power manager",
+                layer: "Kernel Mode - Executive",
+                badge: "EXECUTIVE MANAGER",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-bolt text-sky-400",
+                executables: "ntoskrnl.exe (Po* components)",
+                description: "Řídí spotřebu a stavy napájení (ACPI) jednotlivých zařízení i celého systému (Sleep, Hibernate, Shut down).",
+                keyFunctions: [
+                    "Odesílání IRP_MJ_POWER paketů.",
+                    "Řízení úsporných stavů procesoru a systémových sběrnic."
+                ],
+                codeExample: `PoSetPowerState(...);`
+            },
+            win_gdi: {
+                title: "Window manager & GDI",
+                layer: "Kernel Mode - Executive Subsystem",
+                badge: "GRAPHICS EXECUTIVE",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-paint-brush text-sky-400",
+                executables: "win32k.sys, win32kfull.sys",
+                description: "Ovladač grafiky a oken integrovaný v jádře. Zpracovává vykreslování uživatelského rozhraní, zprávy oken a komunikaci s grafickým ovladačem.",
+                keyFunctions: [
+                    "Window Manager: Okna, nabídky, události myši/klávesnice.",
+                    "GDI: Grafické rozhraní, kreslení 2D objektů a písma."
+                ],
+                codeExample: `NtUserCreateWindowEx(...);`
+            },
+            obj_mgr: {
+                title: "Object manager",
+                layer: "Kernel Mode - Executive Base Layer",
+                badge: "EXECUTIVE BASE",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-cubes-stacked text-sky-400",
+                executables: "ntoskrnl.exe (Ob* components)",
+                description: "Základní vrstva NT Executive. Správce objektů abstrahuje všechny systémové zdroje (soubory, procesy, klíče registrů, synch. objekty) jako Objekty.",
+                keyFunctions: [
+                    "Spravuje jmenný prostor objektů (Directory Objects).",
+                    "Počítání odkazů (Reference Counting).",
+                    "Správa tabulek rukojetí (Handle Tables)."
+                ],
+                codeExample: `ObReferenceObjectByHandle(hProcess, ...);`
+            },
+            kernel_drivers: {
+                title: "Kernel mode drivers",
+                layer: "Kernel Mode",
+                badge: "RING 0 DRIVERS",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-hard-drive text-indigo-400",
+                executables: ".sys soubory (NTFS.sys, disk.sys, ndis.sys)",
+                description: "Moduly ovladačů spouštěné přímo v režimu jádra. Komunikují s hardwarem prostřednictvím HAL a zpracovávají požadavky z I/O Managera.",
+                keyFunctions: [
+                    "WDM / KMDF architektura.",
+                    "Přímý přístup k hardwarovým registrům.",
+                    "Zpracování přerušení (ISR / DPC)."
+                ],
+                codeExample: `NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, ...) { ... }`
+            },
+            microkernel: {
+                title: "Microkernel",
+                layer: "Kernel Mode - Core",
+                badge: "RING 0 CORE",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-brain text-indigo-400",
+                executables: "ntoskrnl.exe (Ke* / Ki* components)",
+                description: "Srdce jádra NT ležící pod NT Executive. Je závislé na architektuře procesoru a provádí nízkoúrovňové plánování vláken na CPU a multiprocesorovou synchronizaci.",
+                keyFunctions: [
+                    "Preemptivní plánování vláken podle priorit.",
+                    "Práce se Spinlocky, Mutexy a Semafory.",
+                    "Obsluha hardwarových přerušení."
+                ],
+                codeExample: `KeAcquireSpinLock(&GlobalLock, &OldIrql);`
+            },
+            hal: {
+                title: "Hardware abstraction layer (HAL)",
+                layer: "Kernel Mode - Hardware Boundary",
+                badge: "HAL.DLL",
+                badgeClass: "bg-slate-800 text-slate-200 border-slate-600",
+                icon: "fa-microchip text-indigo-400",
+                executables: "hal.dll",
+                description: "Vrstva abstrakce hardwaru izoluje zbytek operačního systému od rozdílů konkrétních základních desek, APIC/PIC řadičů přerušení, čipových sad a sběrnic.",
+                keyFunctions: [
+                    "Abstrahuje hardware základní desky.",
+                    "Umožňuje přenositelnost systému NT.",
+                    "Přímá manipulace s HW časovači a DMA."
+                ],
+                codeExample: `WRITE_PORT_UCHAR(PortAddress, Data);`
+            },
+            hardware: {
+                title: "Hardware",
+                layer: "Physical Layer",
+                badge: "PHYSICAL HARDWARE",
+                badgeClass: "bg-amber-950 text-amber-300 border-amber-700",
+                icon: "fa-server text-amber-400",
+                executables: "CPU, RAM, Disky, Sběrnice, GPU, Periferie",
+                description: "Fyzická křemíková vrstva počítačového systému. Zahrnuje procesor s MMU jednotkou, paměťové moduly a všechna připojená V/V zařízení.",
+                keyFunctions: [
+                    "Fyzické provádění instrukcí CPU.",
+                    "Hardwarová kontrola Ring 0 / Ring 3 privilege úrovní.",
+                    "Vyvolávání hardwarových přerušení (IRQ)."
+                ],
+                codeExample: `Hardware IRQ -> APIC Interrupt -> HAL Handler`
+            }
+        };
+
+        let selectedId = null;
+        let demoInterval = null;
+
+        function selectComponent(id) {
+            const data = architectureData[id];
+            if (!data) return;
+
+            if (selectedId) {
+                const prevElem = document.getElementById(`comp-${selectedId}`);
+                if (prevElem) {
+                    prevElem.classList.remove('ring-4', 'ring-amber-400', 'ring-sky-400', 'ring-indigo-400');
+                }
+            }
+
+            selectedId = id;
+            const currentElem = document.getElementById(`comp-${id}`);
+            if (currentElem) {
+                currentElem.classList.add('ring-4', 'ring-amber-400');
+            }
+
+            const badgeElem = document.getElementById('detailBadge');
+            badgeElem.textContent = data.badge;
+            badgeElem.className = `text-[10px] font-mono px-2 py-0.5 rounded border ${data.badgeClass}`;
+
+            const inspector = document.getElementById('inspectorContent');
+            inspector.innerHTML = `
+                <div class="animate-fade-in space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="p-2.5 bg-slate-800 rounded-xl border border-slate-700 text-xl">
+                            <i class="fa-solid ${data.icon}"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-100 leading-snug">${data.title}</h3>
+                            <div class="text-[11px] text-slate-400 font-mono mt-0.5">${data.layer}</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800/80 text-xs text-slate-300">
+                        <span class="font-semibold text-slate-200 block mb-1">Popis funkce:</span>
+                        <p class="leading-relaxed text-slate-400">${data.description}</p>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-semibold text-slate-200 block">Komponenta / Soubory:</span>
+                        <div class="p-2 bg-slate-950 rounded border border-slate-800/60 font-mono text-[11px] text-sky-300 break-all">
+                            ${data.executables}
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-semibold text-slate-200 block">Klíčové funkce:</span>
+                        <ul class="space-y-1 text-xs text-slate-400">
+                            ${data.keyFunctions.map(f => `<li class="flex items-start gap-1.5"><i class="fa-solid fa-angle-right text-sky-400 text-[10px] mt-1"></i> <span>${f}</span></li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-semibold text-slate-200 block">Ukázka / Rozhraní:</span>
+                        <pre class="p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-[10px] font-mono text-emerald-400 overflow-x-auto custom-scrollbar"><code>${escapeHtml(data.codeExample)}</code></pre>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) {
+                Object.keys(architectureData).forEach(id => {
+                    const el = document.getElementById(`comp-${id}`);
+                    if (el) el.style.opacity = '1';
+                });
+                return;
+            }
+
+            Object.keys(architectureData).forEach(id => {
+                const item = architectureData[id];
+                const match = item.title.toLowerCase().includes(query) || 
+                              item.description.toLowerCase().includes(query) || 
+                              item.executables.toLowerCase().includes(query) ||
+                              id.toLowerCase().includes(query);
+                
+                const el = document.getElementById(`comp-${id}`);
+                if (el) {
+                    el.style.opacity = match ? '1' : '0.2';
+                }
+            });
+        });
+
+        function startSyscallDemo() {
+            stopSyscallDemo();
+            const banner = document.getElementById('demoBanner');
+            const stepText = document.getElementById('demoStepText');
+            banner.classList.remove('hidden');
+
+            const steps = [
+                { id: 'app_win32', text: '1/6: Win32 Application zahájí požadavek (např. zápis souboru)...' },
+                { id: 'env_win32', text: '2/6: Win32 Environment Subsystem (csrss) zpracuje požadavek rozhraní...' },
+                { id: 'exec_services', text: '3/6: Přechod do Kernel Mode přes Executive services...' },
+                { id: 'io_mgr', text: '4/6: I/O manager spolu s SRM a VMM ověří oprávnění a vytvoří IRP...' },
+                { id: 'kernel_drivers', text: '5/6: Kernel mode drivers a Microkernel předají operaci HAL...' },
+                { id: 'hardware', text: '6/6: Hardware provedení zápisu na fyzické disk zařízením.' }
+            ];
+
+            let currentStep = 0;
+            
+            function nextStep() {
+                if (currentStep >= steps.length) {
+                    currentStep = 0;
+                }
+                const step = steps[currentStep];
+                stepText.textContent = step.text;
+                selectComponent(step.id);
+                currentStep++;
+            }
+
+            nextStep();
+            demoInterval = setInterval(nextStep, 2500);
+        }
+
+        function stopSyscallDemo() {
+            if (demoInterval) {
+                clearInterval(demoInterval);
+                demoInterval = null;
+            }
+            document.getElementById('demoBanner').classList.add('hidden');
+        }
+
+        function resetDiagram() {
+            stopSyscallDemo();
+            document.getElementById('searchInput').value = '';
+            Object.keys(architectureData).forEach(id => {
+                const el = document.getElementById(`comp-${id}`);
+                if (el) {
+                    el.style.opacity = '1';
+                    el.classList.remove('ring-4', 'ring-amber-400');
+                }
+            });
+            selectComponent('app_win32');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            selectComponent('app_win32');
+        });
+    </script>
+</body>
+</html>
