@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktivní Přehled Windows</title>
+    <!-- Načtení Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Nastavení fontu Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Světle šedé pozadí */
+        }
+        /* Custom styl pro aktivní položku na časové ose */
+        .timeline-item.active {
+            background-color: #3b82f6; /* Modrá barva Windows */
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .timeline-item.active .dot {
+            background-color: #fcd34d; /* Zlatá/žlutá pro zvýraznění */
+            border-color: #fcd34d;
+        }
+        .dot {
+            position: absolute;
+            left: -1rem; /* Umístění tečky mimo prvek pro efekt časové osy */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            border: 3px solid #60a5fa;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        
+        <!-- Nadpis -->
+        <header class="p-6 bg-[#0052cc] text-white">
+            <h1 class="text-3xl font-bold tracking-tight">Přehled klíčových verzí OS Windows</h1>
+            <p class="text-sm opacity-90 mt-1">Interaktivní časová osa vývoje s aktualizovanými inovacemi a typem jádra.</p>
+        </header>
+
+        <main class="grid lg:grid-cols-3">
+            
+            <!-- Levý panel: Časová osa -->
+            <div id="timeline-container" class="lg:col-span-1 p-6 border-r border-gray-200 overflow-y-auto max-h-[80vh] relative">
+                <h2 class="text-lg font-semibold mb-4 text-gray-700">Časová osa verzí</h2>
+                
+                <!-- Svislá čára časové osy -->
+                <div class="absolute left-6 top-16 w-0.5 bg-gray-300 h-full lg:block hidden"></div>
+                
+                <div id="timeline-list" class="space-y-3 lg:pl-6">
+                    <!-- Položky budou generovány zde JS -->
+                </div>
+            </div>
+
+            <!-- Pravý panel: Detaily verze -->
+            <div class="lg:col-span-2 p-6">
+                <h2 class="text-lg font-semibold mb-4 text-gray-700">Detailní informace</h2>
+                <div id="version-details" class="bg-gray-50 p-6 rounded-lg border border-gray-200 min-h-[500px] flex items-center justify-center">
+                    <p class="text-xl text-gray-500 font-medium">Klikněte na verzi vlevo pro zobrazení detailů.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Data pro jednotlivé verze Windows
+        const windowsVersions = [
+            // DOS-based verze (nemají serverový ekvivalent)
+            { name: "Windows 1.0", year: 1985, branch: "DOS-based", innovations: "První grafický frontend pro MS DOS. Ikonické aplikace **Write**, **Paint**, kalkulačka." },
+            { name: "Windows 2.0", year: 1987, branch: "DOS-based", innovations: "Zavedena možnost **překrývání oken**, podpora klávesových zkratek a první **Control Panel**." },
+            { name: "Windows 3.0/3.1", year: 1990, branch: "DOS-based", innovations: "První velký úspěch. **Kooperativní multitasking**. Zavedení **Program Manageru** a **File Manageru** pro správu programů a souborů." },
+            
+            // NT kernel (Desktopové verze a jejich Serverové ekvivalenty)
+            { name: "Windows NT 3.1", year: 1993, branch: "NT kernel", innovations: "První plně **32bitový OS**. Zavedení robustního **NT jádra**, **Preemptivní multitasking**, souborový systém **NTFS**." , serverEquivalent: "Windows NT 3.1 Advanced Server" },
+            { name: "Windows 95", year: 1995, branch: "DOS/9x Hybrid", innovations: "Revoluční rozhraní: **menu Start** a **taskbar**. Plná podpora **Plug and Play**. Zavedení **Internet Exploreru**." },
+            { name: "Windows NT 4.0", year: 1996, branch: "NT kernel", innovations: "Přenesení GUI Windows 95 na stabilní **NT jádro**. Vylepšená podpora **DirectX** pro multimédia.", serverEquivalent: "Windows NT 4.0 Server" },
+            { name: "Windows 98", year: 1998, branch: "DOS/9x Hybrid", innovations: "Vylepšená podpora **USB** a robustnější **Plug and Play**. Integrace Internet Exploreru a funkce **Active Desktop**." },
+            { name: "Windows 2000", year: 2000, branch: "NT kernel", innovations: "Nástupce NT 4.0 pro firemní segment. Zavedení služby **Active Directory**, podpora souborového systému **NTFS 5.0** a **hibernace**.", serverEquivalent: "Windows 2000 Server" }, // Zjednodušeno z "Windows 2000 Pro"
+            { name: "Windows ME", year: 2000, branch: "DOS/9x Hybrid (Poslední)", innovations: "Poslední verze odvozená od MS-DOS. Zavedení **Windows Movie Maker** a **System Restore** (obnova systému)." },
+            { name: "Windows XP", year: 2001, branch: "NT kernel", innovations: "Sjednocení NT jádra pro domácnosti (**eXPerience**). Nový vzhled (Luna), vysoká **stabilita**, funkce **Fast User Switching** a **aktivace produktu**.", serverEquivalent: "Windows Server 2003" },
+            { name: "Windows Vista", year: 2007, branch: "NT kernel", innovations: "Grafické rozhraní **Aero Glass** (průhlednost). Zavedení přísného zabezpečení **UAC** (User Account Control). Podpora **SSD disků**.", serverEquivalent: "Windows Server 2008" },
+            { name: "Windows 7", year: 2009, branch: "NT kernel", innovations: "Optimalizovaný výkon a stabilita. Nový **Superbar** (vylepšený Taskbar), funkce **Knihovny** (Libraries) pro správu souborů a vylepšené dotykové ovládání.", serverEquivalent: "Windows Server 2008 R2" },
+            { 
+                name: "Windows 8", 
+                year: 2012, 
+                branch: "NT kernel", 
+                innovations: "**Uživatelské rozhraní s dlaždicemi** (Metro/Modern UI). Odstranění menu Start. Zavedení **Windows Store**, podpora **Secure Boot** a rychlého spuštění (Fast Startup). Plná nativní podpora **USB 3.0** a bezdrátové komunikace **NFC**. Vylepšená **synchronizace dat s cloudem (OneDrive)**.", 
+                serverEquivalent: "Windows Server 2012" 
+            },
+            { 
+                name: "Windows 8.1", 
+                year: 2013, 
+                branch: "NT kernel", 
+                innovations: "Návrat **tlačítka Start** (ne menu), možnost bootovat přímo na **plochu**. Vylepšené **vyhledávání Bing** a škálování DPI.",
+                serverEquivalent: "Windows Server 2012 R2" // 8.1 je úzce spojen s R2
+            },
+            { 
+                name: "Windows 10", 
+                year: 2015, 
+                branch: "NT kernel (Servisní model)", 
+                innovations: "Sjednocení platformy (**UWP**). **Návrat Start menu**. Asistent **Cortana**, prohlížeč **Edge**, **Virtuální plochy**. Přechod na **servisní model aktualizací** (např. 20H2) namísto vydávání nových verzí.",
+                serverEquivalent: "Windows Server 2016 / 2019 / 2022" // Aktualizováno dle požadavku
+            },
+            { 
+                name: "Windows 11", 
+                year: 2021, 
+                branch: "NT kernel", 
+                innovations: "Přepracovaný design s centrálním taskbarem. Nové funkce **Snap Layouts** (rozvržení oken) a podpora **aplikací Android**. **Zvýšené bezpečnostní nároky** vyžadující čip **TPM 2.0** a **Secure Boot** (UEFI).\n\n**Výrazné vylepšení zabezpečení (Microsoft Defender)** proti ransomwaru a phishingu. Zavedení **Microsoft Copilot** a **umělé inteligence (AI)** do systému. **Optimalizace pro hry** s technologiemi **DirectStorage** a **Auto HDR**.",
+                serverEquivalent: "Windows Server 2025 (předpoklad)"
+            },
+        ];
+
+        const timelineList = document.getElementById('timeline-list');
+        const versionDetails = document.getElementById('version-details');
+        let activeIndex = -1;
+
+        /**
+         * Nahradí Markdown syntax za HTML.
+         * @param {string} text 
+         * @returns {string} HTML formátovaný text
+         */
+        function formatMarkdown(text) {
+            // Nahradí **text** za <strong>text</strong>
+            // Nahradí zalomení řádků (odstavce) za <p>
+            return text.split('\n\n').map(p => `<p class="mb-3">${p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`).join('');
+        }
+
+        /**
+         * Zobrazí detaily vybrané verze.
+         * @param {number} index Index verze v poli windowsVersions
+         */
+        function showDetails(index) {
+            // Odebrání aktivní třídy z předchozího prvku
+            if (activeIndex !== -1) {
+                const prevItem = document.getElementById(`version-${activeIndex}`);
+                if (prevItem) {
+                    prevItem.classList.remove('active');
+                }
+            }
+            
+            // Nastavení nové aktivní verze
+            activeIndex = index;
+            const currentItem = document.getElementById(`version-${activeIndex}`);
+            if (currentItem) {
+                currentItem.classList.add('active');
+            }
+
+            const version = windowsVersions[index];
+
+            // Nastavení barvy štítku podle větve (NT je zelená, DOS je červená)
+            const isNT = version.branch.includes('NT');
+            const branchClass = isNT ? 'bg-green-600' : 'bg-red-600';
+            
+            // Generování HTML pro volitelnou bublinu Serveru
+            let serverBadgeHtml = '';
+            // Odstraněny 'mt-2 sm:mt-0 sm:ml-3' a ponecháno 'ml-2'
+            if (version.serverEquivalent) {
+                serverBadgeHtml = `
+                    <span class="px-3 py-1 text-sm font-semibold rounded-full text-white bg-blue-600 shadow-md whitespace-nowrap ml-2">
+                        Odpovídající Server: ${version.serverEquivalent}
+                    </span>
+                `;
+            }
+
+            // Vytvoření HTML pro detailní panel s novými štítky
+            versionDetails.innerHTML = `
+                <div class="w-full">
+                    <!-- Úprava: Změna layoutu flexu pro zarovnání název vlevo a bubliny vpravo -->
+                    <div class="flex justify-between items-start mb-2">
+                        <!-- Název verze (levá strana) -->
+                        <h3 class="text-4xl font-extrabold text-[#0052cc]">${version.name}</h3>
+
+                        <!-- Kontejner pro bubliny, který se zarovná na pravou stranu -->
+                        <div class="flex flex-col items-end space-y-2">
+                            <span class="px-3 py-1 text-sm font-semibold rounded-full text-white ${branchClass} shadow-md whitespace-nowrap">
+                                Větev: ${version.branch}
+                            </span>
+                            ${serverBadgeHtml}
+                        </div>
+                    </div>
+                    
+                    <!-- Rok vydání (pod názvem verze) -->
+                    <p class="text-lg font-semibold text-gray-600 mb-6">Rok vydání: <span class="text-[#0052cc]">${version.year}</span></p>
+
+                    <h4 class="text-xl font-bold text-gray-800 border-b pb-2 mb-3">Klíčové inovace</h4>
+                    <div class="text-gray-700 leading-relaxed">${formatMarkdown(version.innovations)}</div>
+                </div>
+            `;
+        }
+
+        /**
+         * Generuje časovou osu
+         */
+        function renderTimeline() {
+            windowsVersions.forEach((version, index) => {
+                const item = document.createElement('div');
+                item.id = `version-${index}`;
+                item.className = 'timeline-item relative p-3 rounded-lg cursor-pointer transition duration-300 ease-in-out hover:bg-gray-100 mb-4 shadow-sm';
+                item.innerHTML = `
+                    <div class="dot lg:block hidden"></div>
+                    <p class="text-sm font-medium leading-none">${version.year}</p>
+                    <h4 class="text-xl font-bold">${version.name}</h4>
+                `;
+                item.onclick = () => showDetails(index);
+                timelineList.appendChild(item);
+            });
+            
+            // Automaticky zobrazit detaily pro první verzi při načtení
+            if (windowsVersions.length > 0) {
+                showDetails(0);
+            }
+        }
+
+        // Spuštění aplikace
+        document.addEventListener('DOMContentLoaded', renderTimeline);
+    </script>
+</body>
+</html>
