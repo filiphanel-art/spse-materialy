@@ -1,0 +1,215 @@
+{
+  "title": "Bezpečnost síťové infrastruktury: Firewally, Proxy a VPN",
+  "subject": "Operační systémy a počítačové sítě",
+  "author": "Mgr. Filip Hanel",
+  "slides": [
+    {
+      "id": "slide-1",
+      "title": "Principy a role firewallu",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Filtrování paketů podle IP adres a portů.",
+          "Řízení datového toku mezi síťovými zónami.",
+          "Uplatnění bezpečnostní politiky Default-Deny nebo Default-Allow.",
+          "Ochrana vnitřní sítě před neoprávněným přístupem."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-2",
+      "title": "Stateless vs. Stateful Firewally",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Stateless posuzuje každý paket izolovaně bez kontextu.",
+          "Stateful udržuje stavovou tabulku aktivních relací.",
+          "Stateful automaticky propouští legitimní odpovědní provoz.",
+          "Vyšší úroveň bezpečnosti s vyššími nároky."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-3",
+      "title": "Architektura Next-Generation Firewall (NGFW)",
+      "type": "network_topology",
+      "content": {
+        "bullet_points": [],
+        "mermaid_diagram": "graph TD\n    A[Klient / Internet] --> B[NGFW - Vrstvy 3-7]\n    B --> C[DPI: Deep Packet Inspection]\n    B --> D[IPS / Antivir]\n    B --> E[Identita uživatele / Aplikace]\n    C --> F[Vnitřní důvěryhodná síť]"
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-4",
+      "title": "Srovnání typů firewallů",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Vlastnost",
+            "Stateless",
+            "Stateful",
+            "NGFW"
+          ],
+          "rows": [
+            [
+              "OSI vrstva",
+              "L3 / L4",
+              "L3 / L4",
+              "L3 až L7"
+            ],
+            [
+              "Kontrola obsahu",
+              "Pouze hlavičky",
+              "Hlavičky + stav",
+              "DPI (Payload)"
+            ],
+            [
+              "Sledování stavu",
+              "Ne",
+              "Ano (Stavová tabulka)",
+              "Ano + aplikační kontext"
+            ],
+            [
+              "Detekce hrozeb",
+              "Základní ACL",
+              "Ochrana spojení",
+              "IPS, Antivir, Sandbox"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-5",
+      "title": "Forward Proxy vs. Reverse Proxy",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Forward proxy vystupuje jménem klientských zařízení.",
+          "Skrývá IP adresu klienta a filtruje web.",
+          "Reverse proxy chrání a spravuje aplikační servery.",
+          "Zabezpečuje rozložení zátěže a SSL offloading."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-6",
+      "title": "Protokoly Proxy: SOCKS5 vs. HTTP/HTTPS",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "HTTP proxy interpretuje webový provoz na vrstvě 7.",
+          "SOCKS5 pracuje na relační vrstvě bez šifrování.",
+          "SOCKS5 přenáší libovolný provoz včetně TCP a UDP.",
+          "Vhodné pro P2P, streamování a specifické aplikace."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-7",
+      "title": "Princip a fungování VPN",
+      "type": "theory",
+      "content": {
+        "bullet_points": [
+          "Vytváří zabezpečený šifrovaný tunel mezi zařízením a VPN.",
+          "Chrání veškerý provoz na úrovni operačního systému.",
+          "Využívá šifrovací protokoly IPsec, WireGuard a OpenVPN.",
+          "Znemožňuje odposlech dat na veřejných Wi-Fi sítích."
+        ]
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-8",
+      "title": "Srovnání Proxy a VPN",
+      "type": "table",
+      "content": {
+        "bullet_points": [],
+        "table": {
+          "headers": [
+            "Kritérium",
+            "Proxy Server",
+            "VPN (Virtual Private Network)"
+          ],
+          "rows": [
+            [
+              "Úroveň ochrany",
+              "Aplikace (např. prohlížeč)",
+              "Celý operační systém"
+            ],
+            [
+              "Šifrování",
+              "Většinou žádné (mimo HTTPS)",
+              "Mandatorní silné šifrování"
+            ],
+            [
+              "OSI Vrstva",
+              "Vrstvy 5–7",
+              "Vrstva 3 (Síťová)"
+            ],
+            [
+              "Vhodné použití",
+              "Geoblocking, web scraping",
+              "Zabezpečení práce na dálku a Wi-Fi"
+            ]
+          ]
+        }
+      },
+      "teacher_notes": ""
+    },
+    {
+      "id": "slide-9",
+      "title": "Příklad směrování přes SOCKS5 Proxy",
+      "type": "terminal_output",
+      "content": {
+        "bullet_points": [],
+        "terminal": {
+          "command": "curl -x socks5://192.168.1.50:1080 https://api.ipify.org",
+          "output": "203.0.113.195\n# Provoz přesměrován přes proxy server"
+        }
+      },
+      "teacher_notes": ""
+    }
+  ],
+  "template": "default",
+  "op2_color_scheme": "white",
+  "sources": [
+    {
+      "title": "Stateful and Next-Generation Firewalls (NGFW): The Definitive Enterprise Security Guide",
+      "url": "https://thecyberserver.com/stateful-and-next-generation-firewalls-ngfw-the-definitive-enterprise-security-guide/",
+      "kind": "article"
+    },
+    {
+      "title": "Proxy vs. VPN: Jaký je mezi nimi rozdíl? - Proton",
+      "url": "https://proton.me/cs/blog/proxy-vs-vpn",
+      "kind": "article"
+    },
+    {
+      "title": "Difference between Forward Proxy and Reverse Proxy - GeeksforGeeks",
+      "url": "https://www.geeksforgeeks.org/system-design/difference-between-forward-proxy-and-reverse-proxy/",
+      "kind": "article"
+    },
+    {
+      "title": "Firewalls, Tunnels, and Network Intrusion Detection - Brown CS",
+      "locator": "Slide 5–10",
+      "kind": "pdf"
+    },
+    {
+      "title": "Guide to IPsec VPNs - NIST Technical Series Publications",
+      "locator": "NIST SP 800-77 Rev. 1",
+      "kind": "pdf"
+    },
+    {
+      "title": "Rozdíl mezi VPN a proxy - odvirovat.cz",
+      "url": "https://odvirovat.cz/rozdil-mezi-vpn-a-proxy.html",
+      "kind": "article"
+    }
+  ]
+}
